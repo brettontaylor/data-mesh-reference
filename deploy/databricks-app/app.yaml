@@ -1,0 +1,23 @@
+# Databricks App bundle for DEAL Control Tower (optional packaging, ADR-003).
+# Runs the same image inside the Databricks workspace perimeter, inheriting
+# Databricks auth + networking. Postgres is a managed instance reachable from the app.
+#
+#   databricks apps deploy deal-control-tower --source-code-path .
+name: deal-control-tower
+description: Enterprise metadata management & governance control plane
+command: ["/entrypoint.sh"]
+env:
+  - name: ROLE
+    value: all
+  - name: PORT
+    value: "8000"
+  - name: DEV_AUTH
+    value: "false"
+  # DATABASE_URL, OIDC_ISSUER, GITLAB_* supplied via Databricks app secrets/resources.
+  - name: DATABRICKS_HOST
+    valueFrom: workspace
+resources:
+  - name: dct-postgres
+    description: Postgres projection store
+  - name: dct-secrets
+    description: GitLab token, OIDC client secret, DB URL

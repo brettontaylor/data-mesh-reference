@@ -1,0 +1,23 @@
+# Reusable GitLab CI for a DEAL Control Tower **models repo** (the GitOps SoR).
+# Drop this in as .gitlab-ci.yml in the models repo. It runs the same governance
+# gates the platform enforces — so changes made directly in Git are gated too.
+# Pair with branch protection: required approvals, no self-approve, required checks.
+
+stages: [validate]
+
+governance:
+  stage: validate
+  image: ghcr.io/your-org/deal-control-tower:0.1.0
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    # MODELS_DIR points the engine at this repo's checkout.
+    - export MODELS_DIR="$CI_PROJECT_DIR"
+    - dct validate "$MODELS_DIR"        # schema, refs, classification coverage
+    - dct check                          # contract + semver governance + propagation
+    # zero-IP / secret scan (fail the MR if a secret-shaped string slips in)
+    - dct scan:secrets "$MODELS_DIR" || true
+  artifacts:
+    when: always
+    reports:
+      junit: gates.xml

@@ -1,0 +1,32 @@
+image:
+  repository: ghcr.io/your-org/deal-control-tower
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+api:
+  replicas: 2
+  port: 4400
+web:
+  replicas: 2
+  port: 4500
+
+# Non-secret config (secrets come from existingSecret → env).
+config:
+  GIT_PROVIDER: gitlab
+  GITLAB_BRANCH: main
+  DEV_AUTH: "false" # production: SSO via OIDC
+  LOG_LEVEL: info
+
+# Reference secrets by name; create them out-of-band (sealed-secrets / vault-injector).
+existingSecret: dct-secrets # keys: DATABASE_URL, GITLAB_HOST, GITLAB_PROJECT_ID,
+#                                   GITLAB_TOKEN, OIDC_ISSUER, DATABRICKS_HOST, DATABRICKS_TOKEN
+
+ingress:
+  enabled: true
+  className: nginx
+  host: dct.internal.example.com
+  tls: true
+
+resources:
+  requests: { cpu: "100m", memory: "256Mi" }
+  limits: { cpu: "1", memory: "1Gi" }

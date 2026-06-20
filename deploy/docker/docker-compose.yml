@@ -1,0 +1,46 @@
+# DEAL Control Tower — minimal local/standalone stack.
+#   docker compose -f deploy/docker/docker-compose.yml up
+# Brings up the control-plane API + web UI + Postgres + Redis. The API seeds the
+# projection from the bundled models on first boot (minimal intervention).
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dct
+      POSTGRES_PASSWORD: dct
+      POSTGRES_DB: dct
+    ports: ["5432:5432"]
+    volumes: ["dct_pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dct"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  api:
+    build: { context: ../.., dockerfile: deploy/docker/Dockerfile }
+    environment:
+      ROLE: api
+      PORT: "4400"
+      DATABASE_URL: postgres://dct:dct@postgres:5432/dct
+      # GIT_PROVIDER: gitlab           # set to use GitLab as the models SoR
+      # GITLAB_HOST/PROJECT_ID/TOKEN   # (see .env.example)
+      DEV_AUTH: "true"               # set false + OIDC_ISSUER in production
+    ports: ["4400:4400"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  web:
+    build: { context: ../.., dockerfile: deploy/docker/Dockerfile }
+    environment:
+      ROLE: web
+      PORT: "4500"
+      DCT_API_URL: http://api:4400
+    ports: ["4500:4500"]
+    depends_on: ["api"]
+
+volumes:
+  dct_pg:
