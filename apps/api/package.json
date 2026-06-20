@@ -16,6 +16,7 @@
     "@dct/auth": "workspace:*",
     "@dct/catalog-adapter": "workspace:*",
     "@dct/engine": "workspace:*",
+    "@dct/events": "workspace:*",
     "@dct/git-adapter": "workspace:*",
     "@dct/orchestration-adapter": "workspace:*",
     "@dct/projection": "workspace:*",

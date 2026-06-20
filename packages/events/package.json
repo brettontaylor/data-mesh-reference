@@ -1,0 +1,8 @@
+{
+  "name": "@dct/events",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "description": "Event bus — domain events, webhook delivery (HMAC-signed, retried), dead-letter + replay."
+}

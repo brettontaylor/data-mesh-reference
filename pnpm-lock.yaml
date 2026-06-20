@@ -26,6 +26,9 @@ importers:
       '@dct/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@dct/events':
+        specifier: workspace:*
+        version: link:../../packages/events
       '@dct/git-adapter':
         specifier: workspace:*
         version: link:../../packages/git-adapter
@@ -114,6 +117,8 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+
+  packages/events: {}
 
   packages/git-adapter: {}
 

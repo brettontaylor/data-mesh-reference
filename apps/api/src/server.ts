@@ -18,6 +18,7 @@ import { PipelineService } from "./pipelines";
 import type { EnvTarget } from "@dct/orchestration-adapter";
 import { LineageService } from "./lineage";
 import { UnityCatalogConnector, type ModelView } from "@dct/catalog-adapter";
+import { EventBus } from "@dct/events";
 
 const config = loadConfig();
 const log = createLogger(config.logLevel);
@@ -58,6 +59,7 @@ async function main() {
     lineage.ingest(ev as never),
   );
   const uc = new UnityCatalogConnector(databricks);
+  const events = new EventBus({ now });
 
   const app = Fastify({ logger: false });
 
@@ -211,7 +213,15 @@ async function main() {
     const body = req.body as { title: string; edits: ModelEdit[] };
     if (!body?.title || !Array.isArray(body?.edits))
       throw httpErr(400, "title and edits[] required");
-    return governance.propose(p, body);
+    const cs = await governance.propose(p, body);
+    const breaking = cs.diff.some((d) => d.change === "major");
+    await events.emit({
+      type: "change.proposed",
+      subject: `dct:changeset:${cs.id}`,
+      actor: p.sub,
+      payload: { id: cs.id, title: cs.title, breaking, impact: cs.impact, requiresGovernance: cs.requiresGovernance },
+    });
+    return cs;
   });
   app.get("/api/v1/changesets", async (req) => {
     requireCap(req, "catalog:read");
@@ -233,7 +243,21 @@ async function main() {
   });
   app.post("/api/v1/changesets/:id/merge", async (req) => {
     const p = requireCap(req, "change:merge");
-    return governance.merge(p, (req.params as { id: string }).id);
+    const cs = await governance.merge(p, (req.params as { id: string }).id);
+    await events.emit({
+      type: "change.merged",
+      subject: `dct:changeset:${cs.id}`,
+      actor: p.sub,
+      payload: { id: cs.id, sha: cs.mergedSha, models: cs.edits.map((e) => `${e.kind}:${e.id}`) },
+    });
+    for (const e of cs.edits)
+      await events.emit({
+        type: "model.registered",
+        subject: `dct:model:${e.kind}:${e.id}`,
+        actor: p.sub,
+        payload: { version: (e.spec as { version?: string }).version },
+      });
+    return cs;
   });
 
   // --- orchestration: pipelines ---
@@ -254,7 +278,39 @@ async function main() {
   app.post("/api/v1/pipelines/:id/trigger", async (req) => {
     const p = requireCap(req, "pipeline:deploy");
     const env = ((req.query as Record<string, string>).env ?? "dev") as EnvTarget;
-    return pipelines.trigger(p, (req.params as { id: string }).id, env);
+    const run = await pipelines.trigger(p, (req.params as { id: string }).id, env);
+    await events.emit({
+      type: "pipeline.run.completed",
+      subject: `dct:pipeline:${run.pipelineId}`,
+      actor: p.sub,
+      payload: { runId: run.id, status: run.status, env, ...run.metrics },
+    });
+    return run;
+  });
+
+  // --- events & webhooks (Phase 7) ---
+  app.post("/api/v1/webhooks", async (req) => {
+    requireCap(req, "catalog:read");
+    const b = req.body as { url: string; secret: string; events?: string[] };
+    if (!b?.url || !b?.secret) throw httpErr(400, "url and secret required");
+    return events.subscribe({ url: b.url, secret: b.secret, events: b.events ?? ["*"] });
+  });
+  app.get("/api/v1/webhooks", async (req) => {
+    requireCap(req, "catalog:read");
+    return { webhooks: events.subscriptions() };
+  });
+  app.get("/api/v1/events", async (req) => {
+    requireCap(req, "catalog:read");
+    const since = (req.query as Record<string, string>).since;
+    return { events: events.list(since) };
+  });
+  app.get("/api/v1/webhooks/dlq", async (req) => {
+    requireCap(req, "governance:admin");
+    return { deadLetters: events.deadLetters() };
+  });
+  app.post("/api/v1/webhooks/dlq/:id/replay", async (req) => {
+    requireCap(req, "governance:admin");
+    return events.replay((req.params as { id: string }).id);
   });
 
   // --- lineage (column-level, static + observed) ---
