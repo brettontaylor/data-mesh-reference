@@ -12,11 +12,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@dct/audit": "workspace:*",
+    "@dct/auth": "workspace:*",
     "@dct/engine": "workspace:*",
     "@dct/git-adapter": "workspace:*",
     "@dct/projection": "workspace:*",
     "@dct/shared": "workspace:*",
-    "fastify": "^5.2.0"
+    "fastify": "^5.2.0",
+    "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
