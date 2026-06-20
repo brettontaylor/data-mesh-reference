@@ -1,4 +1,10 @@
-# Data Mesh Reference
+# DEAL Control Tower — Data Mesh Reference (monorepo)
+
+> **Evolving into a product.** This repo is becoming **DEAL Control Tower**, an
+> enterprise metadata management & governance control plane. The proven engine
+> below now lives in [`packages/engine`](packages/engine); the full platform design
+> (services, UI, adapters, metastore, workflows) is in
+> [`docs/platform/`](docs/platform/README.md). It is a pnpm + Turborepo workspace.
 
 A generic, **illustrative** reference architecture for a metadata-driven data
 mesh. One governed contract is the single source of truth; everything downstream
@@ -27,39 +33,42 @@ proves a change propagated everywhere instead of stopping at the spec.
 ## Quick start
 
 ```bash
-npm install
-npm run demo      # check → generate → run medallion → verify propagation
+corepack enable pnpm          # if pnpm isn't installed
+pnpm install
+pnpm demo                     # check → generate → run medallion → verify propagation
 ```
 
-Individual steps:
+Individual steps (run at the root; they target `@dct/engine`):
 
 ```bash
-npm run check     # governance gates (classification, registry, FK, propagation)
-npm run generate  # contracts → generated/ (databricks, snowflake, cube, catalog)
-npm run run       # execute bronze→silver→gold locally on synthetic data
-npm run typecheck
+pnpm check        # governance gates (classification, registry, FK, semver, propagation)
+pnpm generate     # contracts → generated/ (databricks, snowflake, cube, catalog, registry, access)
+pnpm models       # model registry list (BDM/PDM/semantic, with versions)
+pnpm register     # re-baseline the version lock
+pnpm typecheck    # all packages
 ```
 
-No cloud account is required — the medallion runs in-process on the CSVs in
-`examples/data/`. The generated Databricks/Snowflake/Cube artifacts are the real
-stack's code; cloud execution is left to the adopter.
+No cloud account is required — the medallion runs in-process on the synthetic CSVs.
+The generated Databricks/Snowflake/Cube artifacts are the real stack's code; cloud
+execution is left to the adopter.
 
-## Layout
+## Monorepo layout
 
 ```
-contracts/            the governed spec (single source of truth)
-  spec.yaml           version + classification tiers
-  entities/*.yaml     entities, fields (each classified), metrics, dimensions
-  sources/*.yaml      source registrations (cadence, produces, inputs)
-src/
-  framework/          contract types + loader
-  generators/         databricks · snowflake · cube · catalog
-  governance/         the CI gates
-  medallion/          local bronze→silver→gold runner
-  cli.ts              dmref CLI
-examples/data/        synthetic capital-markets CSVs
-generated/            generated artifacts (committed so you can inspect them)
-docs/overview.md      the architecture, explained
+packages/
+  engine/             the proven engine (contracts, generators, registry, access, governance)
+    contracts/        the governed models (bdm/ pdm/ semantic/ sources/ policy + lock)
+    src/              framework · generators · governance · registry · cli
+    examples/data/    synthetic capital-markets CSVs
+    generated/        generated artifacts (committed; the site vendors these)
+  git-adapter/        GitProvider interface (GitLab first) — Phase 1
+  orchestration-adapter/  Orchestrator interface (Databricks/local) — Phase 5
+  shared/ auth/ audit/ catalog-adapter/ sdk-ts/   skeletons (see docs/platform)
+apps/
+  api/ worker/ cli/ web/   control-plane skeletons (built out per the roadmap)
+docs/
+  overview.md         engine architecture
+  platform/           DEAL Control Tower design, playbook, implementation guide
 ```
 
 ## The model

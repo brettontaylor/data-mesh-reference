@@ -3,8 +3,10 @@ node_modules/
 .DS_Store
 .env
 .env.local
+dist/
+.turbo/
 
-# generated/ IS committed on purpose — it lets readers inspect the output
-# without running the toolkit. Regenerate with `npm run generate`.
+# Engine generated/ IS committed on purpose — it lets readers inspect the output
+# (and the site vendors it). Regenerate with `pnpm generate`.
 # Local medallion run outputs are noisy, so ignore just those:
-generated/medallion/
+packages/engine/generated/medallion/

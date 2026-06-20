@@ -1,0 +1,7 @@
+{
+  "name": "@dct/git-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GitProvider interface + implementations (local, GitLab first). Git is the system of record."
+}
