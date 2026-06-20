@@ -127,5 +127,18 @@ export function toSnapshot(c: Contract, sourceSha: string): ProjectionSnapshot {
     modelCount: n,
   }));
 
-  return { sourceSha, domains, models };
+  const access = {
+    defaultRole: c.access.defaultRole,
+    tiers: c.spec.classifications,
+    roles: c.access.roles.map((r) => ({
+      role: r.role,
+      label: r.label,
+      description: r.description,
+      maxTier: r.maxTier,
+      pii: r.pii,
+      mnpi: r.mnpi,
+    })),
+  };
+
+  return { sourceSha, domains, models, access };
 }

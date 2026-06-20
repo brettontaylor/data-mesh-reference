@@ -37,10 +37,26 @@ export interface ModelRecord {
   spec: Record<string, unknown>;
 }
 
+export interface RoleRecord {
+  role: string;
+  label: string;
+  description?: string;
+  maxTier: string;
+  pii: boolean;
+  mnpi: boolean;
+}
+
+export interface AccessPolicyRecord {
+  defaultRole: string;
+  tiers: string[];
+  roles: RoleRecord[];
+}
+
 export interface ProjectionSnapshot {
   sourceSha: string;
   domains: DomainRecord[];
   models: ModelRecord[];
+  access: AccessPolicyRecord;
 }
 
 export interface ModelFilter {

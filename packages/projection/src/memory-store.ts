@@ -1,6 +1,7 @@
 import type { Store } from "./store";
 import { matchesFilter } from "./store";
 import type {
+  AccessPolicyRecord,
   DomainRecord,
   ModelFilter,
   ModelRecord,
@@ -8,11 +9,14 @@ import type {
   ProjectionSnapshot,
 } from "./types";
 
+const EMPTY_ACCESS: AccessPolicyRecord = { defaultRole: "", tiers: [], roles: [] };
+
 /** In-memory projection store — the default. Rebuilt from Git on every reconcile. */
 export class MemoryStore implements Store {
   readonly kind = "memory" as const;
   private models = new Map<string, ModelRecord>();
   private domains: DomainRecord[] = [];
+  private access: AccessPolicyRecord = EMPTY_ACCESS;
   private sourceSha?: string;
   private reconciledAt?: string;
 
@@ -25,8 +29,13 @@ export class MemoryStore implements Store {
   async applySnapshot(s: ProjectionSnapshot): Promise<void> {
     this.models = new Map(s.models.map((m) => [this.key(m.kind, m.id), m]));
     this.domains = s.domains;
+    this.access = s.access;
     this.sourceSha = s.sourceSha;
     this.reconciledAt = new Date().toISOString();
+  }
+
+  async getAccess(): Promise<AccessPolicyRecord> {
+    return this.access;
   }
 
   async listDomains(): Promise<DomainRecord[]> {

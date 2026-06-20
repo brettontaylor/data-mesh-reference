@@ -1,6 +1,7 @@
 import pg from "pg";
 import type { Store } from "./store";
 import type {
+  AccessPolicyRecord,
   DomainRecord,
   ModelFilter,
   ModelRecord,
@@ -28,6 +29,7 @@ CREATE INDEX IF NOT EXISTS model_fts_idx ON model
   USING gin (to_tsvector('english', id || ' ' || coalesce(description,'')));
 CREATE TABLE IF NOT EXISTS projection_meta (
   id int PRIMARY KEY DEFAULT 1, source_sha text, reconciled_at timestamptz,
+  policy jsonb NOT NULL DEFAULT '{"defaultRole":"","tiers":[],"roles":[]}',
   CONSTRAINT single_row CHECK (id = 1)
 );
 `;
@@ -70,10 +72,10 @@ export class PostgresStore implements Store {
         );
       }
       await client.query(
-        `INSERT INTO projection_meta (id, source_sha, reconciled_at)
-         VALUES (1,$1,now())
-         ON CONFLICT (id) DO UPDATE SET source_sha=$1, reconciled_at=now()`,
-        [s.sourceSha],
+        `INSERT INTO projection_meta (id, source_sha, reconciled_at, policy)
+         VALUES (1,$1,now(),$2)
+         ON CONFLICT (id) DO UPDATE SET source_sha=$1, reconciled_at=now(), policy=$2`,
+        [s.sourceSha, JSON.stringify(s.access)],
       );
       await client.query("COMMIT");
     } catch (e) {
@@ -117,6 +119,11 @@ export class PostgresStore implements Store {
 
   async search(q: string): Promise<ModelRecord[]> {
     return this.listModels({ q });
+  }
+
+  async getAccess(): Promise<AccessPolicyRecord> {
+    const { rows } = await this.pool.query("SELECT policy FROM projection_meta WHERE id=1");
+    return rows[0]?.policy ?? { defaultRole: "", tiers: [], roles: [] };
   }
 
   async meta(): Promise<ProjectionMeta> {

@@ -35,5 +35,6 @@ CREATE TABLE IF NOT EXISTS projection_meta (
   id            int PRIMARY KEY DEFAULT 1,
   source_sha    text,
   reconciled_at timestamptz,
+  policy        jsonb NOT NULL DEFAULT '{"defaultRole":"","tiers":[],"roles":[]}',
   CONSTRAINT single_row CHECK (id = 1)
 );

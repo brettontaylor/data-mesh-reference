@@ -2,5 +2,7 @@
   "name": "@dct/sdk",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "main": "src/index.ts",
+  "description": "DEAL Control Tower TypeScript SDK — typed client for the read/publication API."
 }

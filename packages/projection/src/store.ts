@@ -1,4 +1,5 @@
 import type {
+  AccessPolicyRecord,
   DomainRecord,
   ModelFilter,
   ModelRecord,
@@ -22,6 +23,7 @@ export interface Store {
   listModels(filter?: ModelFilter): Promise<ModelRecord[]>;
   getModel(kind: string, id: string): Promise<ModelRecord | undefined>;
   search(q: string): Promise<ModelRecord[]>;
+  getAccess(): Promise<AccessPolicyRecord>;
   meta(): Promise<ProjectionMeta>;
   close(): Promise<void>;
 }
