@@ -42,6 +42,40 @@ export function loadContract(): Contract {
   return { spec, entities, pdms, semanticModels, sources, access };
 }
 
+/**
+ * Build a Contract from an in-memory file list (paths relative to the models
+ * root, e.g. "spec.yaml", "bdm/trade.yaml"). Used by the reconciler so it can
+ * parse a tree fetched from any GitProvider without touching the filesystem.
+ */
+export function parseContract(
+  files: { path: string; content: string }[],
+): Contract {
+  const byPrefix = (prefix: string) =>
+    files
+      .filter(
+        (f) =>
+          f.path.startsWith(prefix) &&
+          (f.path.endsWith(".yaml") || f.path.endsWith(".yml")),
+      )
+      .sort((a, b) => a.path.localeCompare(b.path));
+  const one = (name: string) => files.find((f) => f.path === name);
+
+  const specFile = one("spec.yaml");
+  if (!specFile) throw new Error("parseContract: spec.yaml not found in tree");
+  const accessFile = one("access.yaml") ?? one("policy/access.yaml");
+
+  return {
+    spec: parse(specFile.content) as Spec,
+    entities: byPrefix("bdm/").map((f) => parse(f.content) as Entity),
+    pdms: byPrefix("pdm/").map((f) => parse(f.content) as Pdm),
+    semanticModels: byPrefix("semantic/").map((f) => parse(f.content) as SemanticModel),
+    sources: byPrefix("sources/").map((f) => parse(f.content) as Source),
+    access: accessFile
+      ? (parse(accessFile.content) as AccessModel)
+      : { roles: [], defaultRole: "" },
+  };
+}
+
 // Convenience lookups.
 export function entityById(c: Contract, id: string): Entity | undefined {
   return c.entities.find((e) => e.entity === id);

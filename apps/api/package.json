@@ -2,5 +2,25 @@
   "name": "@dct/api",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "main": "src/server.ts",
+  "description": "DEAL Control Tower control-plane API (Phase 1: read surfaces over the projection).",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "reconcile": "tsx src/reconcile-cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dct/engine": "workspace:*",
+    "@dct/git-adapter": "workspace:*",
+    "@dct/projection": "workspace:*",
+    "@dct/shared": "workspace:*",
+    "fastify": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
 }

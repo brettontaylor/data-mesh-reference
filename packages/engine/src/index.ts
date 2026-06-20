@@ -2,7 +2,7 @@
 export * from "./framework/types";
 export * from "./framework/access";
 export * from "./framework/version";
-export { loadContract, entityById, sourceById, pkOf, ROOT } from "./framework/load";
+export { loadContract, parseContract, entityById, sourceById, pkOf, ROOT } from "./framework/load";
 export * from "./generators";
 export * from "./governance/checks";
 export {

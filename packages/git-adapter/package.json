@@ -3,5 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "src/index.ts",
   "description": "GitProvider interface + implementations (local, GitLab first). Git is the system of record."
 }
