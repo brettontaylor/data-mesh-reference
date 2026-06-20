@@ -26,6 +26,8 @@ export function generateCatalog(c: Contract): GeneratedFile[] {
         name: f.name,
         type: f.type,
         classification: f.classification,
+        ...(f.pii ? { pii: true } : {}),
+        ...(f.mnpi ? { mnpi: true } : {}),
         ...(f.pk ? { primaryKey: true } : {}),
         ...(f.fk ? { references: `${f.fk.entity}.${f.fk.field}` } : {}),
       })),

@@ -28,10 +28,12 @@ fields:
   - name: quantity
     type: decimal(18,4)
     classification: confidential
+    mnpi: true
     description: Net held quantity.
   - name: market_value
     type: decimal(18,2)
     classification: confidential
+    mnpi: true
     description: Mark-to-market value.
   - name: currency_code
     type: string

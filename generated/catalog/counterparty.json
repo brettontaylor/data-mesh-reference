@@ -31,7 +31,8 @@
     {
       "name": "legal_name",
       "type": "string",
-      "classification": "confidential"
+      "classification": "confidential",
+      "pii": true
     },
     {
       "name": "country_code",
@@ -46,7 +47,8 @@
     {
       "name": "internal_risk_score",
       "type": "int",
-      "classification": "restricted"
+      "classification": "restricted",
+      "mnpi": true
     }
   ],
   "lineage": {

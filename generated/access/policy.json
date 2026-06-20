@@ -1,0 +1,792 @@
+{
+  "version": "0.1.0",
+  "model": "attribute-level access control (sensitivity tier + PII + MNPI)",
+  "defaultRole": "public",
+  "roles": [
+    {
+      "role": "public",
+      "label": "Public",
+      "description": "Anonymous / external. Public reference facts only.",
+      "maxTier": "public",
+      "pii": false,
+      "mnpi": false
+    },
+    {
+      "role": "analyst",
+      "label": "Analyst",
+      "description": "Internal analyst. Internal attributes; no PII, no MNPI.",
+      "maxTier": "internal",
+      "pii": false,
+      "mnpi": false
+    },
+    {
+      "role": "trader",
+      "label": "Trader",
+      "description": "Front office. Sees market-sensitive (MNPI) figures; no PII.",
+      "maxTier": "confidential",
+      "pii": false,
+      "mnpi": true
+    },
+    {
+      "role": "risk",
+      "label": "Risk",
+      "description": "Risk management. Counterparty PII + MNPI up to confidential.",
+      "maxTier": "confidential",
+      "pii": true,
+      "mnpi": true
+    },
+    {
+      "role": "compliance",
+      "label": "Compliance",
+      "description": "Oversight. Full visibility, including restricted attributes.",
+      "maxTier": "restricted",
+      "pii": true,
+      "mnpi": true
+    }
+  ],
+  "tiers": [
+    "public",
+    "internal",
+    "confidential",
+    "restricted"
+  ],
+  "matrix": {
+    "public": {
+      "counterparty.counterparty_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "counterparty.lei": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.legal_name": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "pii"
+        ]
+      },
+      "counterparty.country_code": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "counterparty.credit_rating": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "counterparty.internal_risk_score": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "currency.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.minor_units": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.instrument_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "instrument.isin": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.cusip": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.asset_class": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.position_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "position.book_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "position.instrument_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "position.as_of_date": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "position.quantity": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "position.market_value": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "position.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "trade.trade_date": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "trade.instrument_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "trade.counterparty_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "trade.side": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "trade.quantity": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.price": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.notional": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trader_id": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "pii"
+        ]
+      }
+    },
+    "analyst": {
+      "counterparty.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.lei": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.legal_name": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "pii"
+        ]
+      },
+      "counterparty.country_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.credit_rating": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "counterparty.internal_risk_score": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "currency.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.minor_units": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.isin": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.cusip": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.asset_class": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.position_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.book_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.as_of_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.quantity": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "position.market_value": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "position.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.side": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.quantity": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.price": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.notional": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "mnpi"
+        ]
+      },
+      "trade.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trader_id": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "pii"
+        ]
+      }
+    },
+    "trader": {
+      "counterparty.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.lei": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.legal_name": {
+        "visible": false,
+        "reasons": [
+          "pii"
+        ]
+      },
+      "counterparty.country_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.credit_rating": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.internal_risk_score": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "currency.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.minor_units": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.isin": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.cusip": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.asset_class": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.position_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.book_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.as_of_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.market_value": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.side": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.price": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.notional": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trader_id": {
+        "visible": false,
+        "reasons": [
+          "tier",
+          "pii"
+        ]
+      }
+    },
+    "risk": {
+      "counterparty.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.lei": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.legal_name": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.country_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.credit_rating": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.internal_risk_score": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      },
+      "currency.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.minor_units": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.isin": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.cusip": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.asset_class": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.position_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.book_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.as_of_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.market_value": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.side": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.price": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.notional": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trader_id": {
+        "visible": false,
+        "reasons": [
+          "tier"
+        ]
+      }
+    },
+    "compliance": {
+      "counterparty.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.lei": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.legal_name": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.country_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.credit_rating": {
+        "visible": true,
+        "reasons": []
+      },
+      "counterparty.internal_risk_score": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "currency.minor_units": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.isin": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.cusip": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.name": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.asset_class": {
+        "visible": true,
+        "reasons": []
+      },
+      "instrument.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.position_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.book_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.as_of_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.market_value": {
+        "visible": true,
+        "reasons": []
+      },
+      "position.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trade_date": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.instrument_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.counterparty_id": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.side": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.quantity": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.price": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.notional": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.currency_code": {
+        "visible": true,
+        "reasons": []
+      },
+      "trade.trader_id": {
+        "visible": true,
+        "reasons": []
+      }
+    }
+  }
+}

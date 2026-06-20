@@ -111,6 +111,39 @@ export function checkContract(c: Contract): Issue[] {
     }
   }
 
+  // 6. PII / MNPI must not sit in the most-open tier — a tagged attribute that is
+  // also "public" would be visible to everyone, defeating the tag.
+  for (const e of c.entities) {
+    for (const f of e.fields) {
+      if ((f.pii || f.mnpi) && f.classification === c.spec.mostOpenTier) {
+        const tag = f.pii ? "PII" : "MNPI";
+        issues.push({
+          level: "error",
+          code: "TAGGED_FIELD_PUBLIC",
+          message: `${e.entity}.${f.name} is ${tag} but classified "${f.classification}" — tagged attributes must not be in the most-open tier.`,
+        });
+      }
+    }
+  }
+
+  // 7. Access model — defaultRole must exist; tiers must be known.
+  if (!c.access.roles.some((r) => r.role === c.access.defaultRole)) {
+    issues.push({
+      level: "error",
+      code: "DEFAULT_ROLE_UNKNOWN",
+      message: `access defaultRole "${c.access.defaultRole}" is not a defined role.`,
+    });
+  }
+  for (const r of c.access.roles) {
+    if (!valid.has(r.maxTier)) {
+      issues.push({
+        level: "error",
+        code: "ROLE_TIER_UNKNOWN",
+        message: `role "${r.role}" has unknown maxTier "${r.maxTier}".`,
+      });
+    }
+  }
+
   return issues;
 }
 
@@ -143,13 +176,15 @@ export function checkPropagation(c: Contract): Issue[] {
       }
     }
   }
-  // Snowflake DDL is a single combined file.
-  if (!existsSync(join(gen, "snowflake", "serving.sql"))) {
-    issues.push({
-      level: "error",
-      code: "PROPAGATION_INCOMPLETE",
-      message: "missing generated/snowflake/serving.sql — regenerate.",
-    });
+  // Single-file surfaces.
+  for (const single of ["snowflake/serving.sql", "access/policy.json"]) {
+    if (!existsSync(join(gen, single))) {
+      issues.push({
+        level: "error",
+        code: "PROPAGATION_INCOMPLETE",
+        message: `missing generated/${single} — regenerate.`,
+      });
+    }
   }
   return issues;
 }

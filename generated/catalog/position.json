@@ -41,12 +41,14 @@
     {
       "name": "quantity",
       "type": "decimal(18,4)",
-      "classification": "confidential"
+      "classification": "confidential",
+      "mnpi": true
     },
     {
       "name": "market_value",
       "type": "decimal(18,2)",
-      "classification": "confidential"
+      "classification": "confidential",
+      "mnpi": true
     },
     {
       "name": "currency_code",

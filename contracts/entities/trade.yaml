@@ -33,14 +33,17 @@ fields:
   - name: quantity
     type: decimal(18,4)
     classification: confidential
+    mnpi: true
     description: Executed quantity.
   - name: price
     type: decimal(18,6)
     classification: confidential
+    mnpi: true
     description: Execution price.
   - name: notional
     type: decimal(18,2)
     classification: confidential
+    mnpi: true
     description: Notional value (quantity * price).
   - name: currency_code
     type: string
@@ -50,6 +53,7 @@ fields:
   - name: trader_id
     type: string
     classification: restricted
+    pii: true
     description: Identity of the executing trader (personal data).
 
 metrics:

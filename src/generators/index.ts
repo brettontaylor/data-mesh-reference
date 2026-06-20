@@ -7,6 +7,7 @@ import { generateDatabricks, type GeneratedFile } from "./databricks";
 import { generateSnowflake } from "./snowflake";
 import { generateCube } from "./cube";
 import { generateCatalog } from "./catalog";
+import { generateAccess } from "./access";
 
 export function generateAll(c: Contract): GeneratedFile[] {
   return [
@@ -14,6 +15,7 @@ export function generateAll(c: Contract): GeneratedFile[] {
     ...generateSnowflake(c),
     ...generateCube(c),
     ...generateCatalog(c),
+    ...generateAccess(c),
   ];
 }
 

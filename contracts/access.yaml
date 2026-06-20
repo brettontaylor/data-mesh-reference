@@ -1,0 +1,49 @@
+# Access-control model — roles / clearances.
+#
+# A field is visible to a role only if ALL hold:
+#   - field sensitivity tier <= role.maxTier
+#   - field is not PII, OR role.pii == true
+#   - field is not MNPI, OR role.mnpi == true
+# Otherwise the attribute is masked. Enforcement is per-attribute (column level),
+# applied identically in the API, the semantic layer, and the warehouse.
+#
+# This is the differentiator vs. a paywall: access is governed by data
+# classification + clearance, not by a paid tier.
+
+defaultRole: public
+
+roles:
+  - role: public
+    label: Public
+    description: Anonymous / external. Public reference facts only.
+    maxTier: public
+    pii: false
+    mnpi: false
+
+  - role: analyst
+    label: Analyst
+    description: Internal analyst. Internal attributes; no PII, no MNPI.
+    maxTier: internal
+    pii: false
+    mnpi: false
+
+  - role: trader
+    label: Trader
+    description: Front office. Sees market-sensitive (MNPI) figures; no PII.
+    maxTier: confidential
+    pii: false
+    mnpi: true
+
+  - role: risk
+    label: Risk
+    description: Risk management. Counterparty PII + MNPI up to confidential.
+    maxTier: confidential
+    pii: true
+    mnpi: true
+
+  - role: compliance
+    label: Compliance
+    description: Oversight. Full visibility, including restricted attributes.
+    maxTier: restricted
+    pii: true
+    mnpi: true

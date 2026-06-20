@@ -1,6 +1,9 @@
 // Generate Snowflake serving-layer DDL from the contract's gold model, with
-// classification carried through to column comments, masking policies, and roles.
-import type { Contract, Entity, Field } from "../framework/types";
+// attribute-level access control: classification comments, plus a masking policy
+// per sensitive column whose allowed roles are computed by the same access engine
+// the API and semantic layer use.
+import { decide } from "../framework/access";
+import type { Contract, Entity, Field } from "./../framework/types";
 import type { GeneratedFile } from "./databricks";
 
 function sfType(t: string): string {
@@ -10,14 +13,23 @@ function sfType(t: string): string {
   return "VARCHAR";
 }
 
+const roleSql = (role: string) => `DM_${role.toUpperCase()}`;
+
+function tagComment(f: Field): string {
+  const tags: string[] = [f.classification];
+  if (f.pii) tags.push("PII");
+  if (f.mnpi) tags.push("MNPI");
+  return tags.join("/");
+}
+
 function columnDDL(f: Field): string {
   const pk = f.pk ? " PRIMARY KEY" : "";
-  return `    ${f.name.padEnd(20)} ${sfType(f.type)}${pk} COMMENT '${f.classification}: ${(f.description ?? "").replace(/'/g, "''")}'`;
+  return `    ${f.name.padEnd(20)} ${sfType(f.type)}${pk} COMMENT '${tagComment(f)}: ${(f.description ?? "").replace(/'/g, "''")}'`;
 }
 
 function tableDDL(e: Entity): string {
-  // Gold serving excludes restricted columns entirely (defense in depth);
-  // confidential columns are masked by policy below.
+  // Restricted columns are excluded from gold serving entirely (defense in depth);
+  // confidential / PII / MNPI columns are masked per-role by policy below.
   const cols = e.fields.filter((f) => f.classification !== "restricted");
   return `-- ${e.label} (${e.grain})
 CREATE OR REPLACE TABLE GOLD.${e.entity.toUpperCase()} (
@@ -27,40 +39,46 @@ ${cols.map(columnDDL).join(",\n")}
 }
 
 export function generateSnowflake(c: Contract): GeneratedFile[] {
-  const roles = `-- Roles: progressive sensitivity access.
-CREATE ROLE IF NOT EXISTS DM_ANALYST;     -- public + internal
-CREATE ROLE IF NOT EXISTS DM_RISK;        -- + confidential
-CREATE ROLE IF NOT EXISTS DM_ADMIN;       -- all
-`;
-
-  // One masking policy per sensitive tier; applied to confidential columns.
-  const maskingPolicy = `-- Masking: confidential values are visible only to DM_RISK / DM_ADMIN.
-CREATE MASKING POLICY IF NOT EXISTS MASK_CONFIDENTIAL AS (val STRING) RETURNS STRING ->
-  CASE WHEN CURRENT_ROLE() IN ('DM_RISK','DM_ADMIN') THEN val ELSE '***MASKED***' END;
-`;
+  const roleDefs = c.access.roles
+    .map((r) => `CREATE ROLE IF NOT EXISTS ${roleSql(r.role)};  -- ${r.label}: ${r.description ?? ""}`)
+    .join("\n");
 
   const tables = c.entities.map(tableDDL).join("\n");
 
-  const applies = c.entities
-    .flatMap((e) =>
-      e.fields
-        .filter((f) => f.classification === "confidential")
-        .map(
-          (f) =>
-            `ALTER TABLE GOLD.${e.entity.toUpperCase()} MODIFY COLUMN ${f.name} SET MASKING POLICY MASK_CONFIDENTIAL;`,
-        ),
-    )
-    .join("\n");
+  // For each served, non-public column, compute which roles may see it and
+  // emit a column-scoped masking policy.
+  const policies: string[] = [];
+  const applies: string[] = [];
+  for (const e of c.entities) {
+    for (const f of e.fields) {
+      if (f.classification === "restricted") continue; // not served
+      const allowed = c.access.roles.filter((r) => decide(r, f).visible).map((r) => roleSql(r.role));
+      if (allowed.length === c.access.roles.length) continue; // visible to all → no policy
+      const pol = `MASK_${e.entity.toUpperCase()}_${f.name.toUpperCase()}`;
+      policies.push(
+        `CREATE MASKING POLICY IF NOT EXISTS ${pol} AS (val STRING) RETURNS STRING ->
+  CASE WHEN CURRENT_ROLE() IN (${allowed.map((a) => `'${a}'`).join(", ")}) THEN val ELSE '***MASKED***' END;  -- ${tagComment(f)}`,
+      );
+      applies.push(
+        `ALTER TABLE GOLD.${e.entity.toUpperCase()} MODIFY COLUMN ${f.name} SET MASKING POLICY ${pol};`,
+      );
+    }
+  }
 
   const content = `-- AUTO-GENERATED from /contracts — DO NOT EDIT BY HAND. Regenerate: npm run generate
 -- Snowflake serving layer for "${c.spec.name}" v${c.spec.version}
+-- Attribute-level access control: sensitivity tier + PII + MNPI, per role.
 CREATE SCHEMA IF NOT EXISTS GOLD;
 
-${roles}
-${maskingPolicy}
+-- Roles / clearances
+${roleDefs}
+
+-- Per-attribute masking policies (allowed roles computed from the access model)
+${policies.join("\n\n")}
+
 ${tables}
--- Apply masking policies to confidential columns
-${applies}
+-- Apply masking policies
+${applies.join("\n")}
 `;
 
   return [{ path: "snowflake/serving.sql", content }];

@@ -19,6 +19,9 @@ export interface Field {
   pk?: boolean;
   fk?: ForeignKey;
   facet?: boolean; // exposed as a filterable facet / dimension
+  // Orthogonal handling tags layered on top of the sensitivity tier.
+  pii?: boolean; // personally identifiable information
+  mnpi?: boolean; // material non-public information
 }
 
 export interface Metric {
@@ -59,11 +62,27 @@ export interface Spec {
   mostOpenTier: Classification;
 }
 
+/** A role / clearance in the access-control model. */
+export interface Role {
+  role: string;
+  label: string;
+  description?: string;
+  maxTier: Classification; // highest sensitivity tier this role may see
+  pii: boolean; // may see PII attributes
+  mnpi: boolean; // may see MNPI attributes
+}
+
+export interface AccessModel {
+  roles: Role[];
+  defaultRole: string;
+}
+
 /** The fully-loaded contract set every generator and check consumes. */
 export interface Contract {
   spec: Spec;
   entities: Entity[];
   sources: Source[];
+  access: AccessModel;
 }
 
 export const LAYERS = ["bronze", "silver", "gold"] as const;

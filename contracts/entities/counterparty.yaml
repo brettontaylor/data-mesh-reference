@@ -18,6 +18,7 @@ fields:
   - name: legal_name
     type: string
     classification: confidential
+    pii: true
     description: Counterparty legal name (relationship-sensitive).
   - name: country_code
     type: string
@@ -31,6 +32,7 @@ fields:
   - name: internal_risk_score
     type: int
     classification: restricted
+    mnpi: true
     description: Proprietary internal risk score (highly sensitive).
 
 dimensions:
