@@ -13,3 +13,4 @@ export {
   loadLock,
 } from "./registry/registry";
 export * from "./registry/surface";
+export { runMedallion, type LayerStats } from "./medallion/run";

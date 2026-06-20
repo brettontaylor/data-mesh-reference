@@ -16,6 +16,7 @@
     "@dct/auth": "workspace:*",
     "@dct/engine": "workspace:*",
     "@dct/git-adapter": "workspace:*",
+    "@dct/orchestration-adapter": "workspace:*",
     "@dct/projection": "workspace:*",
     "@dct/shared": "workspace:*",
     "fastify": "^5.2.0",

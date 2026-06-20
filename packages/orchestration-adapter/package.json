@@ -3,5 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Orchestrator interface + implementations (local in-process medallion, Databricks Workflows/DLT)."
+  "main": "src/index.ts",
+  "description": "Orchestrator interface + implementations (local in-process medallion, Databricks Workflows/DLT).",
+  "dependencies": {
+    "@dct/engine": "workspace:*"
+  }
 }

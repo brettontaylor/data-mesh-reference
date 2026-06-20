@@ -120,4 +120,32 @@ export class DctClient {
   schema(kind: ModelKind, id: string) {
     return this.get<Record<string, unknown>>(`/api/v1/models/${kind}/${id}/schema.json`);
   }
+
+  pipelines() {
+    return this.get<{ pipelines: SdkPipeline[] }>("/api/v1/pipelines").then((r) => r.pipelines);
+  }
+
+  pipelineRuns(id: string) {
+    return this.get<{ runs: SdkPipelineRun[] }>(`/api/v1/pipelines/${id}/runs`).then((r) => r.runs);
+  }
+}
+
+export interface SdkPipeline {
+  id: string;
+  domain: string;
+  engine: string;
+  cadenceDays: number | null;
+  produces: string[];
+}
+
+export interface SdkPipelineRun {
+  id: string;
+  pipelineId: string;
+  env: string;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
+  metrics: { rowsIn?: number; rowsOut?: number; durationMs?: number };
+  lineageEvents: number;
+  triggeredBy: string;
 }

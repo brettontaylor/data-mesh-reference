@@ -14,6 +14,8 @@ import {
 } from "@dct/auth";
 import { reconcile } from "./reconcile";
 import { GovernanceService, httpErr, type ModelEdit } from "./governance";
+import { PipelineService } from "./pipelines";
+import type { EnvTarget } from "@dct/orchestration-adapter";
 
 const config = loadConfig();
 const log = createLogger(config.logLevel);
@@ -45,6 +47,11 @@ async function main() {
 
   const audit = new MemoryAuditLog();
   const governance = new GovernanceService(config, store, audit, now, log);
+  const databricks =
+    process.env.DATABRICKS_HOST && process.env.DATABRICKS_TOKEN
+      ? { host: process.env.DATABRICKS_HOST, token: process.env.DATABRICKS_TOKEN }
+      : undefined;
+  const pipelines = new PipelineService(store, audit, now, log, databricks);
 
   const app = Fastify({ logger: false });
 
@@ -221,6 +228,27 @@ async function main() {
   app.post("/api/v1/changesets/:id/merge", async (req) => {
     const p = requireCap(req, "change:merge");
     return governance.merge(p, (req.params as { id: string }).id);
+  });
+
+  // --- orchestration: pipelines ---
+  app.get("/api/v1/pipelines", async (req) => {
+    requireCap(req, "catalog:read");
+    return { pipelines: await pipelines.list() };
+  });
+  app.get("/api/v1/pipelines/:id/runs", async (req) => {
+    requireCap(req, "catalog:read");
+    return { runs: await pipelines.runsFor((req.params as { id: string }).id) };
+  });
+  app.post("/api/v1/pipelines/:id/deploy", async (req) => {
+    const p = requireCap(req, "pipeline:deploy");
+    const env = ((req.query as Record<string, string>).env ?? "dev") as EnvTarget;
+    const approver = (req.headers["x-dct-approver"] as string) || undefined;
+    return pipelines.deploy(p, (req.params as { id: string }).id, env, approver);
+  });
+  app.post("/api/v1/pipelines/:id/trigger", async (req) => {
+    const p = requireCap(req, "pipeline:deploy");
+    const env = ((req.query as Record<string, string>).env ?? "dev") as EnvTarget;
+    return pipelines.trigger(p, (req.params as { id: string }).id, env);
   });
 
   // --- immutable audit ---

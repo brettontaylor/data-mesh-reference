@@ -26,6 +26,9 @@ importers:
       '@dct/git-adapter':
         specifier: workspace:*
         version: link:../../packages/git-adapter
+      '@dct/orchestration-adapter':
+        specifier: workspace:*
+        version: link:../../packages/orchestration-adapter
       '@dct/projection':
         specifier: workspace:*
         version: link:../../packages/projection
@@ -111,7 +114,11 @@ importers:
 
   packages/git-adapter: {}
 
-  packages/orchestration-adapter: {}
+  packages/orchestration-adapter:
+    dependencies:
+      '@dct/engine':
+        specifier: workspace:*
+        version: link:../engine
 
   packages/projection:
     dependencies:
