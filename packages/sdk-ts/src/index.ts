@@ -128,6 +128,34 @@ export class DctClient {
   pipelineRuns(id: string) {
     return this.get<{ runs: SdkPipelineRun[] }>(`/api/v1/pipelines/${id}/runs`).then((r) => r.runs);
   }
+
+  lineage() {
+    return this.get<SdkLineageGraph>("/api/v1/lineage");
+  }
+  lineageNode(urn: string, direction: "upstream" | "downstream" = "upstream") {
+    return this.get<{ root: string; direction: string; nodes: string[]; edges: SdkLineageEdge[] }>(
+      `/api/v1/lineage/node?urn=${encodeURIComponent(urn)}&direction=${direction}`,
+    );
+  }
+  ucPlan(env = "dev") {
+    return this.get<SdkUcPlan>(`/api/v1/uc/plan?env=${env}`);
+  }
+}
+
+export interface SdkLineageEdge {
+  from: string;
+  to: string;
+  observed?: boolean;
+}
+export interface SdkLineageGraph {
+  nodes: string[];
+  edges: SdkLineageEdge[];
+}
+export interface SdkUcPlan {
+  env: string;
+  catalog: string;
+  tables: { catalog: string; schema: string; name: string; columns: unknown[] }[];
+  operations: { kind: string; statement: string }[];
 }
 
 export interface SdkPipeline {

@@ -2,5 +2,7 @@
   "name": "@dct/catalog-adapter",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "main": "src/index.ts",
+  "description": "Unity Catalog two-way sync (push plan/apply, pull/import, drift) + OpenLineage."
 }

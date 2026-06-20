@@ -14,6 +14,7 @@
   "dependencies": {
     "@dct/audit": "workspace:*",
     "@dct/auth": "workspace:*",
+    "@dct/catalog-adapter": "workspace:*",
     "@dct/engine": "workspace:*",
     "@dct/git-adapter": "workspace:*",
     "@dct/orchestration-adapter": "workspace:*",

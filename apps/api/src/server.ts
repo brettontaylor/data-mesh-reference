@@ -16,6 +16,8 @@ import { reconcile } from "./reconcile";
 import { GovernanceService, httpErr, type ModelEdit } from "./governance";
 import { PipelineService } from "./pipelines";
 import type { EnvTarget } from "@dct/orchestration-adapter";
+import { LineageService } from "./lineage";
+import { UnityCatalogConnector, type ModelView } from "@dct/catalog-adapter";
 
 const config = loadConfig();
 const log = createLogger(config.logLevel);
@@ -51,7 +53,11 @@ async function main() {
     process.env.DATABRICKS_HOST && process.env.DATABRICKS_TOKEN
       ? { host: process.env.DATABRICKS_HOST, token: process.env.DATABRICKS_TOKEN }
       : undefined;
-  const pipelines = new PipelineService(store, audit, now, log, databricks);
+  const lineage = new LineageService(store);
+  const pipelines = new PipelineService(store, audit, now, log, databricks, (ev) =>
+    lineage.ingest(ev as never),
+  );
+  const uc = new UnityCatalogConnector(databricks);
 
   const app = Fastify({ logger: false });
 
@@ -249,6 +255,46 @@ async function main() {
     const p = requireCap(req, "pipeline:deploy");
     const env = ((req.query as Record<string, string>).env ?? "dev") as EnvTarget;
     return pipelines.trigger(p, (req.params as { id: string }).id, env);
+  });
+
+  // --- lineage (column-level, static + observed) ---
+  app.get("/api/v1/lineage", async (req) => {
+    requireCap(req, "catalog:read");
+    return lineage.graph();
+  });
+  app.get("/api/v1/lineage/node", async (req) => {
+    requireCap(req, "catalog:read");
+    const q = req.query as Record<string, string | undefined>;
+    if (!q.urn) throw httpErr(400, "urn query param required");
+    const dir = (q.direction as "upstream" | "downstream") ?? "upstream";
+    return lineage.traverse(q.urn, dir, q.depth ? Number(q.depth) : 10);
+  });
+  app.get("/api/v1/lineage/impact/:entity", async (req) => {
+    requireCap(req, "catalog:read");
+    return { entity: (req.params as { entity: string }).entity, impacted: await lineage.impact((req.params as { entity: string }).entity) };
+  });
+
+  // --- Unity Catalog sync (plan is workspace-free; apply needs creds) ---
+  app.get("/api/v1/uc/plan", async (req) => {
+    requireCap(req, "catalog:read");
+    const env = ((req.query as Record<string, string>).env ?? "dev") as EnvTarget;
+    const bdms = await store.listModels({ kind: "bdm" });
+    const models: ModelView[] = bdms.map((m) => ({
+      kind: m.kind,
+      id: m.id,
+      domain: m.domain,
+      owner: m.owner,
+      table: `GOLD.${m.id.toUpperCase()}`,
+      fields: m.fields.map((f) => ({
+        name: f.name, type: f.type, classification: f.classification,
+        pii: f.pii, mnpi: f.mnpi, isPk: f.isPk,
+      })),
+    }));
+    return uc.plan({ env, models });
+  });
+  app.post("/api/v1/uc/apply", async (req) => {
+    requireCap(req, "governance:admin");
+    return uc.apply(); // applies the plan via the Databricks SDK; needs a workspace
   });
 
   // --- immutable audit ---

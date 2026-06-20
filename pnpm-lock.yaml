@@ -20,6 +20,9 @@ importers:
       '@dct/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@dct/catalog-adapter':
+        specifier: workspace:*
+        version: link:../../packages/catalog-adapter
       '@dct/engine':
         specifier: workspace:*
         version: link:../../packages/engine

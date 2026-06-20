@@ -43,6 +43,7 @@ export class PipelineService {
     private now: () => string,
     private log?: Logger,
     databricks?: { host: string; token: string },
+    private lineageSink?: (events: unknown[]) => void,
   ) {
     this.orch = createOrchestrator(databricks ? { databricks } : undefined);
   }
@@ -95,6 +96,7 @@ export class PipelineService {
     const handle = await this.orch.trigger(ref);
     const status = await this.orch.status(handle);
     const { metrics, lineage } = await this.orch.collect(handle);
+    this.lineageSink?.(lineage);
     const run: PipelineRun = {
       id: randomUUID(),
       pipelineId: id,
