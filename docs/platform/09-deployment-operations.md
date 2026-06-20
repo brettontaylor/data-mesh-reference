@@ -19,10 +19,10 @@ clean path to HA production.
 
 ## 2. Configuration (one source, layered)
 
-- A single typed config (`harbormaster.yaml` + env overrides) validated at boot;
+- A single typed config (`dct.yaml` + env overrides) validated at boot;
   the app **refuses to start** on invalid/missing required config with a precise
   message (fail fast, no half-up state).
-- Layering: defaults → `harbormaster.yaml` → env vars → secret manager. Secrets
+- Layering: defaults → `dct.yaml` → env vars → secret manager. Secrets
   never in the YAML.
 - Key config groups: `server`, `database`, `redis`, `git` (provider, repo, bot
   identity), `idp` (OIDC/SAML), `databricks` (workspaces/envs), `secrets`
@@ -57,7 +57,7 @@ minutes with no manual DB or schema steps.
 
 ### 4.2 Models repo (customer's data models)
 - A provided **reusable CI workflow** runs the engine gates on every PR
-  (`hbr validate`, `checkContract`, `checkVersions`, propagation, secret/term scan)
+  (`dct validate`, `checkContract`, `checkVersions`, propagation, secret/term scan)
   and posts results to the ChangeSet — so governance holds even for changes made
   directly in Git, not just via the UI.
 - Branch protection templates (required reviews, no self-approve, required checks)
@@ -87,7 +87,7 @@ minutes with no manual DB or schema steps.
 
 ## 7. Backup, DR & business continuity
 
-- **Git is the SoR** → definitions survive total platform loss; `hbr reconcile
+- **Git is the SoR** → definitions survive total platform loss; `dct reconcile
   --rebuild` reconstructs the projection from Git.
 - **Postgres**: PITR backups (workflow state, audit, run history, lineage). The
   **audit chain** is included and verified on restore.

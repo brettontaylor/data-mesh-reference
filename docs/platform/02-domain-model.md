@@ -29,7 +29,7 @@ definitions. Layout is domain-first so ownership maps to paths + CODEOWNERS:
 
 ```
 models-repo/
-├── harbormaster.yaml                 # repo-level config: standard version, environments, settings
+├── dct.yaml                 # repo-level config: standard version, environments, settings
 ├── CODEOWNERS                        # domain path → steward groups (drives reviewer assignment)
 ├── domains/
 │   ├── trading/
@@ -298,11 +298,11 @@ Products are the unit consumers subscribe to; subscriptions drive impact analysi
 Every object has a stable URN for lineage, audit, and cross-references:
 
 ```
-hbr:model:bdm:trading.trade@2.0.0
-hbr:field:trading.trade.price
-hbr:product:trading.trading_activity@1.0.0
-hbr:lineage:gold.GOLD_TRADE.notional
-hbr:run:pipeline:trade@2026-06-20T07:00Z
+dct:model:bdm:trading.trade@2.0.0
+dct:field:trading.trade.price
+dct:product:trading.trading_activity@1.0.0
+dct:lineage:gold.GOLD_TRADE.notional
+dct:run:pipeline:trade@2026-06-20T07:00Z
 ```
 
 URNs are environment-qualified where relevant (`...:prod:...`) so the same logical

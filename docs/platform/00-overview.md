@@ -17,7 +17,7 @@ discoverable data products is **manual, fragmented, and drift-prone**:
 - Classification (PII / MNPI), access control, and lineage are bolted on after the
   fact rather than flowing from the model.
 
-**Harbormaster** makes the model the control surface. A single governed model
+**DEAL Control Tower** makes the model the control surface. A single governed model
 definition — versioned, reviewed, classified — drives the pipeline, the semantic
 layer, the warehouse serving, the access policy, the documentation, and the
 machine-readable contracts. Change the model; everything downstream regenerates,
@@ -49,10 +49,10 @@ and governance proves the change was reviewed and propagated.
 
 ## 4. Non-goals (explicitly out of scope, at least for v1)
 
-- **Not a data-processing engine.** Harbormaster orchestrates Databricks; it does
+- **Not a data-processing engine.** DEAL Control Tower orchestrates Databricks; it does
   not move or transform data itself.
 - **Not a BI tool.** It publishes governed semantic models; visualization lives in
-  the org's BI layer (which consumes from Harbormaster).
+  the org's BI layer (which consumes from DEAL Control Tower).
 - **Not a replacement for Unity Catalog's storage/compute governance.** It is a
   control plane *above* UC; it syncs with UC, it does not reimplement it.
 - **Not a full DQ engine in v1.** It registers data-quality *contracts* and
@@ -76,7 +76,7 @@ and governance proves the change was reviewed and propagated.
 
 ```
                           ┌─────────────────────────────────────────┐
-                          │            HARBORMASTER                   │
+                          │         DEAL CONTROL TOWER                │
                           │         (control plane)                   │
   ┌───────────┐  publish  │  ┌──────────┐  ┌──────────┐  ┌─────────┐ │  consume  ┌───────────┐
   │ Modelers  │──────────▶│  │  Model   │  │ Workflow │  │ Catalog │ │──────────▶│ Analysts  │
@@ -132,7 +132,7 @@ Capabilities (each detailed in later docs):
 
 The current `data-mesh-reference` already implements the **engine**: the contract
 model, the generators (Databricks/Cube/Snowflake/catalog), the access policy, the
-governance checks, the registry, and semantic versioning. Harbormaster wraps that
+governance checks, the registry, and semantic versioning. DEAL Control Tower wraps that
 engine in a **control plane** (services + UI + workflows + metastore + adapters).
 The engine becomes `packages/engine`; nothing is thrown away. See
 [01-architecture.md](01-architecture.md#monorepo-layout).

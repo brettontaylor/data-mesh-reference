@@ -1,6 +1,6 @@
 # 11 — Implementation Roadmap & Playbook
 
-How to build Harbormaster from today's `data-mesh-reference`, phase by phase, with
+How to build DEAL Control Tower from today's `data-mesh-reference`, phase by phase, with
 work breakdown, testing strategy, and acceptance criteria. Each phase is shippable
 and independently valuable.
 
@@ -27,7 +27,7 @@ and independently valuable.
 - `git-adapter` interface + a `local` (bare repo) impl + GitHub impl.
 - Postgres schema + migrations (`model`, `model_field`, `model_version`, `domain`,
   `model_edge`).
-- **Reconciler**: Git tree@SHA → projection (idempotent); `hbr reconcile [--rebuild]`.
+- **Reconciler**: Git tree@SHA → projection (idempotent); `dct reconcile [--rebuild]`.
 - `apps/api` read endpoints: domains, models, registry, search (FTS).
 - Seed loader (synthetic models) → models repo → projection.
 - **Acceptance:** edit a model in Git → reconcile → it appears via API; rebuild from
@@ -120,7 +120,7 @@ and independently valuable.
 | `packages/orchestration-adapter` | 5 | interface + local + databricks |
 | `packages/catalog-adapter` | 6 | UC sync + OpenLineage |
 | `packages/sdk-ts` / `sdk-python` | 2+ | typed clients |
-| `apps/cli` | 1+ | `hbr` (supersedes `dmref`) |
+| `apps/cli` | 1+ | `dct` (supersedes `dmref`) |
 | `deploy/*` | 8 | docker/helm/terraform/databricks-app |
 
 ## 4. Testing strategy

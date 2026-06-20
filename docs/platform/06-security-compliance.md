@@ -56,7 +56,7 @@ fired (auditable "why was this masked/allowed").
 - **Egress control:** the app's only outbound dependencies are the Git provider,
   Databricks, the IdP, the secret manager, and notification channels — all
   allow-listed; supports PrivateLink/VNet/peering inside the corporate perimeter.
-- **No raw business data at rest in the platform.** Harbormaster stores *metadata*;
+- **No raw business data at rest in the platform.** DEAL Control Tower stores *metadata*;
   data-product "data" endpoints proxy governed reads from Databricks/warehouse and
   are not persisted (beyond short caches honoring classification).
 
@@ -116,7 +116,7 @@ Designed in even though it's a later add-on:
 
 ## 10. Regulatory mapping (how the design satisfies controls)
 
-| Control area | How Harbormaster addresses it |
+| Control area | How DEAL Control Tower addresses it |
 |--------------|-------------------------------|
 | Change management / SoX | Maker/checker, quorum, immutable audit, Git history, no self-approval |
 | BCBS 239 (lineage/quality) | Column-level lineage (static + OpenLineage), DQ contracts + run evidence, ownership |

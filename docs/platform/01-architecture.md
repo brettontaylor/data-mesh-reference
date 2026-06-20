@@ -2,7 +2,7 @@
 
 ## 1. Architectural style
 
-Harbormaster is a **modular monolith** (deployable as one container) with clean
+DEAL Control Tower is a **modular monolith** (deployable as one container) with clean
 internal module boundaries that can be peeled into services later. This is the
 right call for "stand up with minimal intervention": one process, one image,
 optional horizontal scale — without the operational tax of microservices on day
@@ -27,7 +27,7 @@ Core tenets:
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ CLIENTS                                                                         │
-│  Web UI (Next.js)   CLI (hbr)   SDK (TS/Python)   CI bots   External apps      │
+│  Web UI (Next.js)   CLI (dct)   SDK (TS/Python)   CI bots   External apps      │
 └───────────────┬─────────────────┬───────────────────┬───────────────┬─────────┘
                 │ HTTPS (OIDC)     │ token            │ token          │ token
 ┌───────────────▼─────────────────▼───────────────────▼───────────────▼─────────┐
@@ -140,7 +140,7 @@ record is traceable to an exact definition revision.
 - A **merge webhook** triggers incremental reconcile. A scheduled job runs a full
   reconcile (e.g., every 10 min) as a safety net and to catch out-of-band commits.
 - The reconciler is **idempotent**: it computes the desired projection from the Git
-  tree at a SHA and upserts/deletes to match. A `hbr reconcile --rebuild` wipes and
+  tree at a SHA and upserts/deletes to match. A `dct reconcile --rebuild` wipes and
   rebuilds the projection from Git (the DR path).
 - **Drift detection:** if the projection's SHA diverges from the repo's default
   branch head for longer than a threshold, raise an operational alert.
@@ -170,7 +170,7 @@ The repo (`data-mesh-reference`, evolving) becomes a workspace monorepo
 │   ├── api/                    # Node API service (Fastify/Nest) — the control plane
 │   ├── web/                    # Next.js UI
 │   ├── worker/                 # job runner (BullMQ) — reconcile, sync, deploy, poll
-│   └── cli/                    # `hbr` CLI (wraps engine + API)
+│   └── cli/                    # `dct` CLI (wraps engine + API)
 ├── sdk-python/                 # Python consumer SDK (thin REST client + models)
 ├── db/
 │   └── migrations/             # SQL migrations (forward-only)
@@ -186,7 +186,7 @@ The repo (`data-mesh-reference`, evolving) becomes a workspace monorepo
 
 > Migration note: the current `src/` moves under `packages/engine/`, `contracts/`
 > become the **seed** model repo content, and `generated/` output is produced on
-> demand. Backwards-compatible CLI (`dmref`) is preserved as an alias of `hbr`.
+> demand. Backwards-compatible CLI (`dmref`) is preserved as an alias of `dct`.
 
 ## 6. Technology stack
 

@@ -50,7 +50,7 @@ generated specs — it never reads YAML directly.
 - **Idempotent:** deploy diffs desired vs existing (by name + content hash) and
   updates in place; unchanged pipelines are skipped.
 - **Cluster policy / compute** is config (per environment): job clusters, photon,
-  autoscaling bounds, instance pools — all from `harbormaster.yaml`, not hardcoded.
+  autoscaling bounds, instance pools — all from `dct.yaml`, not hardcoded.
 
 ### 2.3 Trigger modes
 - **Scheduled** (from cadence) — the Workflow's own cron in Databricks.

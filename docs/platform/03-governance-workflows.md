@@ -70,7 +70,7 @@ provider (defense in depth):
 5. **Break-glass** is possible but loud: an emergency override requires two admins,
    a written reason, a time-box, and emits a high-severity audit + alert.
 
-A configurable **policy matrix** (`harbormaster.yaml`) expresses these rules as
+A configurable **policy matrix** (`dct.yaml`) expresses these rules as
 data so each org can tune quorum without code changes.
 
 ## 4. Automated gates (must pass before approval is allowed)
@@ -162,7 +162,7 @@ classification mask**. Every allow/deny on sensitive data is auditable.
 
 1. A modeler in `trading` widens `trade.price` precision (a **major**/breaking
    change) and bumps `trade` `2.0.0 → 2.1.0` (a **minor**, insufficient).
-2. `hbr propose` validates locally, opens a PR, creates a ChangeSet.
+2. `dct propose` validates locally, opens a PR, creates a ChangeSet.
 3. Gates run: **semver gate fails** — "major change, bump to ≥ 3.0.0." The modeler
    corrects to `3.0.0`. Gates go green.
 4. Impact analysis flags `trading_activity` product + 2 subscribers + the

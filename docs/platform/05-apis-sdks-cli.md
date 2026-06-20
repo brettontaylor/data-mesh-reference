@@ -72,7 +72,7 @@ For each model/product the platform serves machine-readable contracts (the
 - `…/openapi.json` — the consumption endpoints for that product
 - `…/context.jsonld` — JSON-LD semantic context (for semantic-web/catalog federation)
 - `…/lineage.json` — OpenLineage-formatted lineage
-- `/.well-known/harbormaster.json` — capability descriptor + standard version + changelog
+- `/.well-known/dct.json` — capability descriptor + standard version + changelog
 
 ## 2. SDKs
 
@@ -80,55 +80,55 @@ For each model/product the platform serves machine-readable contracts (the
 Typed client generated from OpenAPI + hand-written ergonomic helpers:
 
 ```ts
-import { Harbormaster } from "@harbormaster/sdk";
-const hbr = new Harbormaster({ baseUrl, token });           // OIDC or API key
+import { DealControlTower } from "@dct/sdk";
+const dct = new DealControlTower({ baseUrl, token });           // OIDC or API key
 
 // consume
-const product = await hbr.products.get("trading_activity");
-const rows = await hbr.products.data("trading_activity", { role: "analyst" });
-const lineage = await hbr.lineage.upstream("hbr:field:trading.trade.notional");
+const product = await dct.products.get("trading_activity");
+const rows = await dct.products.data("trading_activity", { role: "analyst" });
+const lineage = await dct.lineage.upstream("dct:field:trading.trade.notional");
 
 // produce (governed)
-const cs = await hbr.changesets.propose({
+const cs = await dct.changesets.propose({
   title: "Add settlement_date to trade",
   edits: [{ kind: "bdm", id: "trade", patch: { addField: {/*…*/} } }],
 });
-await hbr.changesets.submit(cs.id);
+await dct.changesets.submit(cs.id);
 ```
 
 ### 2.2 Python SDK (`sdk-python`)
 Thin REST client + pydantic models (for data scientists / Databricks notebooks):
 
 ```python
-from harbormaster import Client
-hbr = Client(base_url, token)
-df = hbr.product("trading_activity").to_pandas(role="risk")   # access-governed
-schema = hbr.model("bdm", "trade").schema
+from dct import Client
+dct = Client(base_url, token)
+df = dct.product("trading_activity").to_pandas(role="risk")   # access-governed
+schema = dct.model("bdm", "trade").schema
 ```
 
 Both SDKs respect classification masking transparently and surface clear errors when
 a field/measure is unavailable to the caller's clearance.
 
-## 3. CLI (`hbr`)
+## 3. CLI (`dct`)
 
 For modelers, platform engineers, and CI. Wraps the engine locally + the API
 remotely.
 
 ```
-hbr init                      # scaffold a models repo / connect to an existing one
-hbr validate [path]           # engine validation locally (pre-commit)
-hbr diff <model>              # control-surface diff vs registered baseline
-hbr propose -m "…"            # branch + commit + open PR + create ChangeSet
-hbr models | model <id>       # registry list / detail (existing dmref commands)
-hbr register                  # update the lock (post-merge / release)
-hbr simulate <model>          # impact + generated-artifact preview
-hbr generate                  # write generated/ artifacts locally
-hbr pipeline deploy|trigger|runs --env staging
-hbr lineage <urn> [--down]    # lineage/impact from the CLI
-hbr login                     # OIDC device flow → token cache
+dct init                      # scaffold a models repo / connect to an existing one
+dct validate [path]           # engine validation locally (pre-commit)
+dct diff <model>              # control-surface diff vs registered baseline
+dct propose -m "…"            # branch + commit + open PR + create ChangeSet
+dct models | model <id>       # registry list / detail (existing dmref commands)
+dct register                  # update the lock (post-merge / release)
+dct simulate <model>          # impact + generated-artifact preview
+dct generate                  # write generated/ artifacts locally
+dct pipeline deploy|trigger|runs --env staging
+dct lineage <urn> [--down]    # lineage/impact from the CLI
+dct login                     # OIDC device flow → token cache
 ```
 
-`dmref` remains a documented alias of `hbr` for the engine subset (no breakage).
+`dmref` remains a documented alias of `dct` for the engine subset (no breakage).
 
 ## 4. Events & webhooks (push)
 

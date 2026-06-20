@@ -1,8 +1,10 @@
-# Harbormaster — Enterprise Metadata Management Platform
+# DEAL Control Tower — Enterprise Metadata Management Platform
 
-> **Working product name:** **Harbormaster** (the authority that governs what may
-> dock at the quay — fitting for a governance control plane). Changeable; used
-> throughout these docs as the placeholder name.
+> **Product name:** **DEAL Control Tower** — the control plane over **DEAL** (the
+> team's Data Enrichment & Abstraction Layer, the Databricks medallion data lake).
+> It orchestrates the DEAL pipelines, governs the models that drive them, and gives
+> org-wide oversight of everything flowing through the lake. Technical slugs: `dct`
+> (CLI), `@dct/*` (packages), `dct.yaml` (config), `dct:` (URNs).
 >
 > **Repo strategy:** evolve `data-mesh-reference` into a monorepo. The current
 > engine (contracts, generators, registry, access, governance) becomes
