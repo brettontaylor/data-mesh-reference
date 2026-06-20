@@ -4,6 +4,10 @@ group: reference
 grain: one row per ISO 4217 currency
 owner: reference-data
 source: reference_feed
+# Model control (BDM)
+version: 1.0.0
+status: active
+upstream: ISO 4217 registry
 
 fields:
   - name: currency_code

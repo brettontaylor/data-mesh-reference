@@ -1,0 +1,426 @@
+{
+  "models": {
+    "counterparty": {
+      "version": "1.1.0",
+      "surface": {
+        "kind": "bdm",
+        "grain": "one row per legal counterparty",
+        "group": "reference",
+        "fields": {
+          "counterparty_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": true,
+            "fk": null
+          },
+          "lei": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "legal_name": {
+            "type": "string",
+            "classification": "confidential",
+            "pii": true,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "country_code": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "credit_rating": {
+            "type": "string",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "internal_risk_score": {
+            "type": "int",
+            "classification": "restricted",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          }
+        }
+      },
+      "signature": "f54078f10da01353"
+    },
+    "currency": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "bdm",
+        "grain": "one row per ISO 4217 currency",
+        "group": "reference",
+        "fields": {
+          "currency_code": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": true,
+            "fk": null
+          },
+          "name": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "minor_units": {
+            "type": "int",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          }
+        }
+      },
+      "signature": "cffa72ef0c75f145"
+    },
+    "instrument": {
+      "version": "1.2.0",
+      "surface": {
+        "kind": "bdm",
+        "grain": "one row per tradable instrument",
+        "group": "reference",
+        "fields": {
+          "instrument_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": true,
+            "fk": null
+          },
+          "isin": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "cusip": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "name": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "asset_class": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "currency_code": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "currency.currency_code"
+          }
+        }
+      },
+      "signature": "09635cbd3debe0cb"
+    },
+    "position": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "bdm",
+        "grain": "one row per book / instrument / as-of date",
+        "group": "position",
+        "fields": {
+          "position_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": true,
+            "fk": null
+          },
+          "book_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "instrument_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "instrument.instrument_id"
+          },
+          "as_of_date": {
+            "type": "date",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "quantity": {
+            "type": "decimal(18,4)",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          },
+          "market_value": {
+            "type": "decimal(18,2)",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          },
+          "currency_code": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "currency.currency_code"
+          }
+        }
+      },
+      "signature": "cf268b49f7896134"
+    },
+    "trade": {
+      "version": "2.0.0",
+      "surface": {
+        "kind": "bdm",
+        "grain": "one row per executed trade",
+        "group": "transaction",
+        "fields": {
+          "trade_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": true,
+            "fk": null
+          },
+          "trade_date": {
+            "type": "date",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "instrument_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "instrument.instrument_id"
+          },
+          "counterparty_id": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "counterparty.counterparty_id"
+          },
+          "side": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
+          "quantity": {
+            "type": "decimal(18,4)",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          },
+          "price": {
+            "type": "decimal(18,6)",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          },
+          "notional": {
+            "type": "decimal(18,2)",
+            "classification": "confidential",
+            "pii": false,
+            "mnpi": true,
+            "pk": false,
+            "fk": null
+          },
+          "currency_code": {
+            "type": "string",
+            "classification": "public",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": "currency.currency_code"
+          },
+          "trader_id": {
+            "type": "string",
+            "classification": "restricted",
+            "pii": true,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          }
+        }
+      },
+      "signature": "dcd88191966672c1"
+    },
+    "counterparty_physical": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "pdm",
+        "bdm": "counterparty",
+        "physical": {
+          "table": "GOLD.COUNTERPARTY",
+          "loadStrategy": "full",
+          "partitionBy": null,
+          "uniqueKey": "counterparty_id"
+        }
+      },
+      "signature": "4b95718d15e9713f"
+    },
+    "currency_physical": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "pdm",
+        "bdm": "currency",
+        "physical": {
+          "table": "GOLD.CURRENCY",
+          "loadStrategy": "full",
+          "partitionBy": null,
+          "uniqueKey": "currency_code"
+        }
+      },
+      "signature": "bb36a6c6f3e451a3"
+    },
+    "instrument_physical": {
+      "version": "1.0.1",
+      "surface": {
+        "kind": "pdm",
+        "bdm": "instrument",
+        "physical": {
+          "table": "GOLD.INSTRUMENT",
+          "loadStrategy": "full",
+          "partitionBy": null,
+          "uniqueKey": "instrument_id"
+        }
+      },
+      "signature": "9c397576c9471a03"
+    },
+    "position_physical": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "pdm",
+        "bdm": "position",
+        "physical": {
+          "table": "GOLD.POSITION",
+          "loadStrategy": "incremental",
+          "partitionBy": "as_of_date",
+          "uniqueKey": "position_id"
+        }
+      },
+      "signature": "d13e1e8aaf8bc7b6"
+    },
+    "trade_physical": {
+      "version": "1.3.0",
+      "surface": {
+        "kind": "pdm",
+        "bdm": "trade",
+        "physical": {
+          "table": "GOLD.TRADE",
+          "loadStrategy": "incremental",
+          "partitionBy": "trade_date",
+          "uniqueKey": "trade_id"
+        }
+      },
+      "signature": "e6865ab7d0373dce"
+    },
+    "reference_master": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "semantic",
+        "sources": [
+          "counterparty",
+          "currency",
+          "instrument"
+        ],
+        "dimensions": [
+          "counterparty.country_code",
+          "counterparty.credit_rating",
+          "instrument.asset_class",
+          "instrument.currency_code"
+        ],
+        "measures": []
+      },
+      "signature": "3c929339916956f7"
+    },
+    "trading_activity": {
+      "version": "0.2.0",
+      "surface": {
+        "kind": "semantic",
+        "sources": [
+          "position",
+          "trade"
+        ],
+        "dimensions": [
+          "trade.counterparty_id",
+          "trade.instrument_id",
+          "trade.side",
+          "trade.trade_date"
+        ],
+        "measures": [
+          "position.market_value_sum",
+          "trade.notional_sum",
+          "trade.trade_count"
+        ]
+      },
+      "signature": "7ab92ff1b88e3654"
+    }
+  }
+}

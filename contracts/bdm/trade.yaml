@@ -4,6 +4,10 @@ group: transaction
 grain: one row per executed trade
 owner: trading-data
 source: trades_feed
+# Model control (BDM)
+version: 2.0.0
+status: active
+upstream: Order Management System
 
 fields:
   - name: trade_id

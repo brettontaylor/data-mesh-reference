@@ -7,6 +7,12 @@ import { loadContract } from "./framework/load";
 import { checkContract, checkPropagation, type Issue } from "./governance/checks";
 import { generateAll, writeGenerated } from "./generators";
 import { runMedallion } from "./medallion/run";
+import {
+  buildModels,
+  checkVersions,
+  statusVsLock,
+  writeLock,
+} from "./registry/registry";
 
 function printIssues(issues: Issue[]): number {
   const errors = issues.filter((i) => i.level === "error");
@@ -24,11 +30,63 @@ function cmdCheck(includePropagation = true): number {
   const c = loadContract();
   console.log(`\nGovernance — ${c.spec.name} v${c.spec.version}`);
   let errors = printIssues(checkContract(c));
+  console.log("\nModel versioning:");
+  errors += printIssues(checkVersions(c));
   if (includePropagation) {
     console.log("\nPropagation:");
     errors += printIssues(checkPropagation(c));
   }
   return errors;
+}
+
+function cmdModels(): number {
+  const c = loadContract();
+  const rows = statusVsLock(c);
+  console.log(`\nModel registry — ${c.spec.name}`);
+  console.log("  kind      model                    version  locked   change");
+  for (const r of rows) {
+    console.log(
+      `  ${r.kind.padEnd(9)} ${r.id.padEnd(24)} ${r.version.padEnd(8)} ${(r.locked ?? "—").padEnd(8)} ${r.change}`,
+    );
+  }
+  return 0;
+}
+
+function cmdModel(id: string | undefined): number {
+  if (!id) {
+    console.log("usage: dmref model <id>");
+    return 2;
+  }
+  const c = loadContract();
+  const m = buildModels(c).find((x) => x.id === id);
+  if (!m) {
+    console.log(`unknown model "${id}". Run \`dmref models\`.`);
+    return 1;
+  }
+  console.log(`\n${m.kind.toUpperCase()} ${m.id}  v${m.version}  [${m.status}]`);
+  console.log(`  depends on: ${m.dependsOn.join(", ") || "—"}`);
+  console.log("  surface:");
+  console.log(
+    JSON.stringify(m.surface, null, 2)
+      .split("\n")
+      .map((l) => "    " + l)
+      .join("\n"),
+  );
+  return 0;
+}
+
+function cmdRegister(): number {
+  const c = loadContract();
+  // Refuse to register if versioning is inconsistent.
+  const vissues = checkVersions(c).filter((i) => i.level === "error");
+  if (vissues.length) {
+    console.log("\nRefusing to register — fix versioning first:");
+    printIssues(vissues);
+    return 1;
+  }
+  const n = writeLock(c);
+  console.log(`\n✓ registered ${n} models → contracts/registry.lock.json`);
+  return 0;
 }
 
 function cmdGenerate(): number {
@@ -75,6 +133,15 @@ function main() {
     case "run":
       process.exit(cmdRun());
       break;
+    case "models":
+      process.exit(cmdModels());
+      break;
+    case "model":
+      process.exit(cmdModel(process.argv[3]));
+      break;
+    case "register":
+      process.exit(cmdRegister());
+      break;
     case "demo": {
       const e1 = cmdCheck(false);
       if (e1 > 0) process.exit(1);
@@ -87,7 +154,7 @@ function main() {
       break;
     }
     default:
-      console.log("usage: dmref <generate|check|run|demo>");
+      console.log("usage: dmref <generate|check|run|demo|models|model|register>");
       process.exit(2);
   }
 }

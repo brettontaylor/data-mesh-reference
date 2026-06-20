@@ -1,4 +1,4 @@
-# AUTO-GENERATED from contracts/entities/instrument.yaml — DO NOT EDIT BY HAND.
+# AUTO-GENERATED from contracts/bdm/instrument.yaml — DO NOT EDIT BY HAND.
 # Regenerate with: npm run generate
 #
 # Entity : Instrument (instrument)

@@ -4,6 +4,10 @@ group: reference
 grain: one row per legal counterparty
 owner: reference-data
 source: reference_feed
+# Model control (BDM)
+version: 1.1.0
+status: active
+upstream: Counterparty Master (KYC)
 
 fields:
   - name: counterparty_id

@@ -1,0 +1,11 @@
+pdm: trade_physical
+bdm: trade
+version: 1.3.0
+status: active
+owner: platform-eng
+source: trades_feed
+physical:
+  table: GOLD.TRADE
+  loadStrategy: incremental
+  partitionBy: trade_date
+  uniqueKey: trade_id

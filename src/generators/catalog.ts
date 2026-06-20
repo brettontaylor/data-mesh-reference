@@ -37,7 +37,12 @@ export function generateCatalog(c: Contract): GeneratedFile[] {
         gold: `GOLD.${e.entity.toUpperCase()}`,
         semantic: `cube:${e.entity}`,
       },
-      metrics: (e.metrics ?? []).map((m) => m.name),
+      metrics: (e.metrics ?? []).map((m) => ({
+        name: m.name,
+        agg: m.agg,
+        field: m.field,
+        ...(m.description ? { description: m.description } : {}),
+      })),
     };
     files.push({
       path: `catalog/${e.entity}.json`,

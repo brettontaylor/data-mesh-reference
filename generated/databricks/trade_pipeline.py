@@ -1,4 +1,4 @@
-# AUTO-GENERATED from contracts/entities/trade.yaml — DO NOT EDIT BY HAND.
+# AUTO-GENERATED from contracts/bdm/trade.yaml — DO NOT EDIT BY HAND.
 # Regenerate with: npm run generate
 #
 # Entity : Trade (trade)

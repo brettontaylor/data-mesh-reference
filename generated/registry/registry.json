@@ -1,0 +1,245 @@
+{
+  "standardVersion": "0.1.0",
+  "counts": {
+    "bdm": 5,
+    "pdm": 5,
+    "semantic": 2
+  },
+  "models": [
+    {
+      "id": "counterparty",
+      "kind": "bdm",
+      "version": "1.1.0",
+      "status": "active",
+      "owner": "reference-data",
+      "upstream": "Counterparty Master (KYC)",
+      "dependsOn": [
+        "source:reference_feed"
+      ],
+      "signature": "f54078f10da01353",
+      "detail": {
+        "group": "reference",
+        "grain": "one row per legal counterparty",
+        "fields": 6
+      }
+    },
+    {
+      "id": "currency",
+      "kind": "bdm",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "reference-data",
+      "upstream": "ISO 4217 registry",
+      "dependsOn": [
+        "source:reference_feed"
+      ],
+      "signature": "cffa72ef0c75f145",
+      "detail": {
+        "group": "reference",
+        "grain": "one row per ISO 4217 currency",
+        "fields": 3
+      }
+    },
+    {
+      "id": "instrument",
+      "kind": "bdm",
+      "version": "1.2.0",
+      "status": "active",
+      "owner": "reference-data",
+      "upstream": "Security Master (Golden Source)",
+      "dependsOn": [
+        "source:reference_feed"
+      ],
+      "signature": "09635cbd3debe0cb",
+      "detail": {
+        "group": "reference",
+        "grain": "one row per tradable instrument",
+        "fields": 6
+      }
+    },
+    {
+      "id": "position",
+      "kind": "bdm",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "trading-data",
+      "upstream": "Position Keeping System",
+      "dependsOn": [
+        "source:trades_feed"
+      ],
+      "signature": "cf268b49f7896134",
+      "detail": {
+        "group": "position",
+        "grain": "one row per book / instrument / as-of date",
+        "fields": 7
+      }
+    },
+    {
+      "id": "trade",
+      "kind": "bdm",
+      "version": "2.0.0",
+      "status": "active",
+      "owner": "trading-data",
+      "upstream": "Order Management System",
+      "dependsOn": [
+        "source:trades_feed"
+      ],
+      "signature": "dcd88191966672c1",
+      "detail": {
+        "group": "transaction",
+        "grain": "one row per executed trade",
+        "fields": 10
+      }
+    },
+    {
+      "id": "counterparty_physical",
+      "kind": "pdm",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "platform-eng",
+      "dependsOn": [
+        "bdm:counterparty",
+        "source:reference_feed"
+      ],
+      "signature": "4b95718d15e9713f",
+      "detail": {
+        "bdm": "counterparty",
+        "table": "GOLD.COUNTERPARTY",
+        "loadStrategy": "full",
+        "uniqueKey": "counterparty_id"
+      }
+    },
+    {
+      "id": "currency_physical",
+      "kind": "pdm",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "platform-eng",
+      "dependsOn": [
+        "bdm:currency",
+        "source:reference_feed"
+      ],
+      "signature": "bb36a6c6f3e451a3",
+      "detail": {
+        "bdm": "currency",
+        "table": "GOLD.CURRENCY",
+        "loadStrategy": "full",
+        "uniqueKey": "currency_code"
+      }
+    },
+    {
+      "id": "instrument_physical",
+      "kind": "pdm",
+      "version": "1.0.1",
+      "status": "active",
+      "owner": "platform-eng",
+      "dependsOn": [
+        "bdm:instrument",
+        "source:reference_feed"
+      ],
+      "signature": "9c397576c9471a03",
+      "detail": {
+        "bdm": "instrument",
+        "table": "GOLD.INSTRUMENT",
+        "loadStrategy": "full",
+        "uniqueKey": "instrument_id"
+      }
+    },
+    {
+      "id": "position_physical",
+      "kind": "pdm",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "platform-eng",
+      "dependsOn": [
+        "bdm:position",
+        "source:trades_feed"
+      ],
+      "signature": "d13e1e8aaf8bc7b6",
+      "detail": {
+        "bdm": "position",
+        "table": "GOLD.POSITION",
+        "loadStrategy": "incremental",
+        "partitionBy": "as_of_date",
+        "uniqueKey": "position_id"
+      }
+    },
+    {
+      "id": "trade_physical",
+      "kind": "pdm",
+      "version": "1.3.0",
+      "status": "active",
+      "owner": "platform-eng",
+      "dependsOn": [
+        "bdm:trade",
+        "source:trades_feed"
+      ],
+      "signature": "e6865ab7d0373dce",
+      "detail": {
+        "bdm": "trade",
+        "table": "GOLD.TRADE",
+        "loadStrategy": "incremental",
+        "partitionBy": "trade_date",
+        "uniqueKey": "trade_id"
+      }
+    },
+    {
+      "id": "reference_master",
+      "kind": "semantic",
+      "version": "1.0.0",
+      "status": "active",
+      "owner": "reference-data",
+      "dependsOn": [
+        "bdm:instrument",
+        "bdm:counterparty",
+        "bdm:currency"
+      ],
+      "signature": "3c929339916956f7",
+      "detail": {
+        "description": "Conformed reference dimensions — instruments, counterparties, currencies — for joining and filtering across the mesh.",
+        "sources": [
+          "instrument",
+          "counterparty",
+          "currency"
+        ],
+        "dimensions": [
+          "instrument.asset_class",
+          "instrument.currency_code",
+          "counterparty.country_code",
+          "counterparty.credit_rating"
+        ],
+        "measures": []
+      }
+    },
+    {
+      "id": "trading_activity",
+      "kind": "semantic",
+      "version": "0.2.0",
+      "status": "active",
+      "owner": "analytics",
+      "dependsOn": [
+        "bdm:trade",
+        "bdm:position"
+      ],
+      "signature": "7ab92ff1b88e3654",
+      "detail": {
+        "description": "Trading activity and exposure — notional flow and mark-to-market by instrument, counterparty, and book.",
+        "sources": [
+          "trade",
+          "position"
+        ],
+        "dimensions": [
+          "trade.trade_date",
+          "trade.instrument_id",
+          "trade.counterparty_id",
+          "trade.side"
+        ],
+        "measures": [
+          "trade.notional_sum",
+          "trade.trade_count",
+          "position.market_value_sum"
+        ]
+      }
+    }
+  ]
+}

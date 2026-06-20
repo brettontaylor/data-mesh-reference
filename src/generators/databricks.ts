@@ -11,7 +11,7 @@ export interface GeneratedFile {
 
 function pyHeader(e: Entity, c: Contract): string {
   const src = sourceById(c, e.source);
-  return `# AUTO-GENERATED from contracts/entities/${e.entity}.yaml — DO NOT EDIT BY HAND.
+  return `# AUTO-GENERATED from contracts/bdm/${e.entity}.yaml — DO NOT EDIT BY HAND.
 # Regenerate with: npm run generate
 #
 # Entity : ${e.label} (${e.entity})

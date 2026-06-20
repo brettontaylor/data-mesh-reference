@@ -39,7 +39,7 @@ function cubeYaml(e: Entity): string {
     })
     .join("\n");
 
-  return `# AUTO-GENERATED from contracts/entities/${e.entity}.yaml — DO NOT EDIT. Regenerate: npm run generate
+  return `# AUTO-GENERATED from contracts/bdm/${e.entity}.yaml — DO NOT EDIT. Regenerate: npm run generate
 cubes:
   - name: ${e.entity}
     sql_table: GOLD.${e.entity.toUpperCase()}

@@ -1,0 +1,17 @@
+semanticModel: trading_activity
+version: 0.2.0
+status: active
+owner: analytics
+description: Trading activity and exposure — notional flow and mark-to-market by instrument, counterparty, and book.
+sources:
+  - trade
+  - position
+dimensions:
+  - { entity: trade, field: trade_date }
+  - { entity: trade, field: instrument_id }
+  - { entity: trade, field: counterparty_id }
+  - { entity: trade, field: side }
+measures:
+  - { entity: trade, metric: notional_sum }
+  - { entity: trade, metric: trade_count }
+  - { entity: position, metric: market_value_sum }

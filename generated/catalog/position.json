@@ -64,6 +64,11 @@
     "semantic": "cube:position"
   },
   "metrics": [
-    "market_value_sum"
+    {
+      "name": "market_value_sum",
+      "agg": "sum",
+      "field": "market_value",
+      "description": "Total mark-to-market exposure."
+    }
   ]
 }

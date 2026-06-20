@@ -8,6 +8,7 @@ import { generateSnowflake } from "./snowflake";
 import { generateCube } from "./cube";
 import { generateCatalog } from "./catalog";
 import { generateAccess } from "./access";
+import { generateRegistry } from "./registry";
 
 export function generateAll(c: Contract): GeneratedFile[] {
   return [
@@ -16,6 +17,7 @@ export function generateAll(c: Contract): GeneratedFile[] {
     ...generateCube(c),
     ...generateCatalog(c),
     ...generateAccess(c),
+    ...generateRegistry(c),
   ];
 }
 

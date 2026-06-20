@@ -1,4 +1,4 @@
-# AUTO-GENERATED from contracts/entities/currency.yaml — DO NOT EDIT BY HAND.
+# AUTO-GENERATED from contracts/bdm/currency.yaml — DO NOT EDIT BY HAND.
 # Regenerate with: npm run generate
 #
 # Entity : Currency (currency)

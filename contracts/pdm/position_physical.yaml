@@ -1,0 +1,11 @@
+pdm: position_physical
+bdm: position
+version: 1.0.0
+status: active
+owner: platform-eng
+source: trades_feed
+physical:
+  table: GOLD.POSITION
+  loadStrategy: incremental
+  partitionBy: as_of_date
+  uniqueKey: position_id

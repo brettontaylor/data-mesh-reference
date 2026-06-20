@@ -1,4 +1,4 @@
-# AUTO-GENERATED from contracts/entities/position.yaml — DO NOT EDIT. Regenerate: npm run generate
+# AUTO-GENERATED from contracts/bdm/position.yaml — DO NOT EDIT. Regenerate: npm run generate
 cubes:
   - name: position
     sql_table: GOLD.POSITION

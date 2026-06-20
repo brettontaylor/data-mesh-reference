@@ -1,0 +1,10 @@
+pdm: counterparty_physical
+bdm: counterparty
+version: 1.0.0
+status: active
+owner: platform-eng
+source: reference_feed
+physical:
+  table: GOLD.COUNTERPARTY
+  loadStrategy: full
+  uniqueKey: counterparty_id

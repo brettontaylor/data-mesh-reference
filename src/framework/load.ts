@@ -3,7 +3,15 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
-import type { AccessModel, Contract, Entity, Source, Spec } from "./types";
+import type {
+  AccessModel,
+  Contract,
+  Entity,
+  Pdm,
+  SemanticModel,
+  Source,
+  Spec,
+} from "./types";
 
 // Repo root = two levels up from src/framework.
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -22,14 +30,16 @@ function listYaml(dir: string): string[] {
 
 export function loadContract(): Contract {
   const spec = readYaml<Spec>(join(CONTRACTS, "spec.yaml"));
-  const entities = listYaml(join(CONTRACTS, "entities")).map((p) =>
-    readYaml<Entity>(p),
+  const entities = listYaml(join(CONTRACTS, "bdm")).map((p) => readYaml<Entity>(p));
+  const pdms = listYaml(join(CONTRACTS, "pdm")).map((p) => readYaml<Pdm>(p));
+  const semanticModels = listYaml(join(CONTRACTS, "semantic")).map((p) =>
+    readYaml<SemanticModel>(p),
   );
   const sources = listYaml(join(CONTRACTS, "sources")).map((p) =>
     readYaml<Source>(p),
   );
   const access = readYaml<AccessModel>(join(CONTRACTS, "access.yaml"));
-  return { spec, entities, sources, access };
+  return { spec, entities, pdms, semanticModels, sources, access };
 }
 
 // Convenience lookups.

@@ -4,6 +4,10 @@ group: reference
 grain: one row per tradable instrument
 owner: reference-data
 source: reference_feed
+# Model control (BDM)
+version: 1.2.0
+status: active
+upstream: Security Master (Golden Source)
 
 fields:
   - name: instrument_id

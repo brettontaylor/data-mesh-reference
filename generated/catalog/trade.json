@@ -83,7 +83,17 @@
     "semantic": "cube:trade"
   },
   "metrics": [
-    "notional_sum",
-    "trade_count"
+    {
+      "name": "notional_sum",
+      "agg": "sum",
+      "field": "notional",
+      "description": "Total notional traded."
+    },
+    {
+      "name": "trade_count",
+      "agg": "count",
+      "field": "trade_id",
+      "description": "Number of trades."
+    }
   ]
 }

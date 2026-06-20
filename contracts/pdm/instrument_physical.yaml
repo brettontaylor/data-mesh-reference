@@ -1,0 +1,10 @@
+pdm: instrument_physical
+bdm: instrument
+version: 1.0.1
+status: active
+owner: platform-eng
+source: reference_feed
+physical:
+  table: GOLD.INSTRUMENT
+  loadStrategy: full
+  uniqueKey: instrument_id

@@ -1,0 +1,10 @@
+pdm: currency_physical
+bdm: currency
+version: 1.0.0
+status: active
+owner: platform-eng
+source: reference_feed
+physical:
+  table: GOLD.CURRENCY
+  loadStrategy: full
+  uniqueKey: currency_code

@@ -1,4 +1,4 @@
-# AUTO-GENERATED from contracts/entities/position.yaml — DO NOT EDIT BY HAND.
+# AUTO-GENERATED from contracts/bdm/position.yaml — DO NOT EDIT BY HAND.
 # Regenerate with: npm run generate
 #
 # Entity : Position (position)

@@ -4,6 +4,10 @@ group: position
 grain: one row per book / instrument / as-of date
 owner: trading-data
 source: trades_feed
+# Model control (BDM)
+version: 1.0.0
+status: active
+upstream: Position Keeping System
 
 fields:
   - name: position_id

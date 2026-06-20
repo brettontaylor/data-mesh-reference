@@ -126,6 +126,60 @@ export function checkContract(c: Contract): Issue[] {
     }
   }
 
+  // 6b. PDM integrity — references resolve; uniqueKey is a real BDM field.
+  for (const p of c.pdms) {
+    const bdm = entityById(c, p.bdm);
+    if (!bdm) {
+      issues.push({
+        level: "error",
+        code: "PDM_BDM_UNKNOWN",
+        message: `PDM "${p.pdm}" references unknown BDM "${p.bdm}".`,
+      });
+    } else if (!bdm.fields.some((f) => f.name === p.physical.uniqueKey)) {
+      issues.push({
+        level: "error",
+        code: "PDM_KEY_UNKNOWN",
+        message: `PDM "${p.pdm}" uniqueKey "${p.physical.uniqueKey}" is not a field of BDM "${p.bdm}".`,
+      });
+    }
+    if (!c.sources.some((s) => s.source === p.source)) {
+      issues.push({
+        level: "error",
+        code: "PDM_SOURCE_UNKNOWN",
+        message: `PDM "${p.pdm}" references unknown source "${p.source}".`,
+      });
+    }
+  }
+
+  // 6c. Semantic-model integrity — sources, dimensions, and measures resolve.
+  for (const sm of c.semanticModels) {
+    for (const src of sm.sources)
+      if (!entityById(c, src))
+        issues.push({
+          level: "error",
+          code: "SEMANTIC_SOURCE_UNKNOWN",
+          message: `semantic model "${sm.semanticModel}" references unknown entity "${src}".`,
+        });
+    for (const d of sm.dimensions) {
+      const e = entityById(c, d.entity);
+      if (!e || !e.fields.some((f) => f.name === d.field))
+        issues.push({
+          level: "error",
+          code: "SEMANTIC_DIM_UNKNOWN",
+          message: `semantic model "${sm.semanticModel}" dimension "${d.entity}.${d.field}" does not resolve.`,
+        });
+    }
+    for (const m of sm.measures) {
+      const e = entityById(c, m.entity);
+      if (!e || !(e.metrics ?? []).some((mm) => mm.name === m.metric))
+        issues.push({
+          level: "error",
+          code: "SEMANTIC_MEASURE_UNKNOWN",
+          message: `semantic model "${sm.semanticModel}" measure "${m.entity}.${m.metric}" does not resolve.`,
+        });
+    }
+  }
+
   // 7. Access model — defaultRole must exist; tiers must be known.
   if (!c.access.roles.some((r) => r.role === c.access.defaultRole)) {
     issues.push({
@@ -177,7 +231,7 @@ export function checkPropagation(c: Contract): Issue[] {
     }
   }
   // Single-file surfaces.
-  for (const single of ["snowflake/serving.sql", "access/policy.json"]) {
+  for (const single of ["snowflake/serving.sql", "access/policy.json", "registry/registry.json"]) {
     if (!existsSync(join(gen, single))) {
       issues.push({
         level: "error",

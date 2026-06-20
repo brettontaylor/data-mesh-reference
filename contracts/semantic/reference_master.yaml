@@ -1,0 +1,15 @@
+semanticModel: reference_master
+version: 1.0.0
+status: active
+owner: reference-data
+description: Conformed reference dimensions — instruments, counterparties, currencies — for joining and filtering across the mesh.
+sources:
+  - instrument
+  - counterparty
+  - currency
+dimensions:
+  - { entity: instrument, field: asset_class }
+  - { entity: instrument, field: currency_code }
+  - { entity: counterparty, field: country_code }
+  - { entity: counterparty, field: credit_rating }
+measures: []

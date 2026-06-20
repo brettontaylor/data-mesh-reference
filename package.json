@@ -9,6 +9,9 @@
     "check": "tsx src/cli.ts check",
     "run": "tsx src/cli.ts run",
     "demo": "tsx src/cli.ts demo",
+    "models": "tsx src/cli.ts models",
+    "model": "tsx src/cli.ts model",
+    "register": "tsx src/cli.ts register",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
