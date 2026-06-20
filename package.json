@@ -1,0 +1,22 @@
+{
+  "name": "data-mesh-reference",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generic, illustrative reference architecture for a metadata-driven data mesh: one governed contract drives medallion pipelines, a published semantic layer, and warehouse serving.",
+  "scripts": {
+    "generate": "tsx src/cli.ts generate",
+    "check": "tsx src/cli.ts check",
+    "run": "tsx src/cli.ts run",
+    "demo": "tsx src/cli.ts demo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

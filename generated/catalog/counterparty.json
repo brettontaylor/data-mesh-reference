@@ -1,0 +1,59 @@
+{
+  "dataProduct": "counterparty",
+  "title": "Counterparty",
+  "version": "0.1.0",
+  "group": "reference",
+  "grain": "one row per legal counterparty",
+  "owner": "reference-data",
+  "source": {
+    "id": "reference_feed",
+    "kind": "csv",
+    "cadenceDays": 1
+  },
+  "classificationSummary": {
+    "internal": 2,
+    "public": 1,
+    "confidential": 2,
+    "restricted": 1
+  },
+  "schema": [
+    {
+      "name": "counterparty_id",
+      "type": "string",
+      "classification": "internal",
+      "primaryKey": true
+    },
+    {
+      "name": "lei",
+      "type": "string",
+      "classification": "public"
+    },
+    {
+      "name": "legal_name",
+      "type": "string",
+      "classification": "confidential"
+    },
+    {
+      "name": "country_code",
+      "type": "string",
+      "classification": "internal"
+    },
+    {
+      "name": "credit_rating",
+      "type": "string",
+      "classification": "confidential"
+    },
+    {
+      "name": "internal_risk_score",
+      "type": "int",
+      "classification": "restricted"
+    }
+  ],
+  "lineage": {
+    "bronze": "bronze_counterparty",
+    "silver": "silver_counterparty",
+    "gold": "GOLD.COUNTERPARTY",
+    "semantic": "cube:counterparty"
+  },
+  "metrics": []
+}

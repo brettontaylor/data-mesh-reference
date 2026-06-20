@@ -1,0 +1,25 @@
+# AUTO-GENERATED from contracts/entities/counterparty.yaml — DO NOT EDIT. Regenerate: npm run generate
+cubes:
+  - name: counterparty
+    sql_table: GOLD.COUNTERPARTY
+    title: Counterparty
+    description: one row per legal counterparty
+    meta:
+      owner: reference-data
+      group: reference
+    dimensions:
+    - name: counterparty_id
+      sql: counterparty_id
+      type: string
+      meta:
+        classification: internal
+    - name: country_code
+      sql: country_code
+      type: string
+      meta:
+        classification: internal
+    - name: credit_rating
+      sql: credit_rating
+      type: string
+      meta:
+        classification: confidential

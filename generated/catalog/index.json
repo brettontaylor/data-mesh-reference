@@ -1,0 +1,48 @@
+{
+  "catalog": "capital-markets-reference",
+  "version": "0.1.0",
+  "description": "An illustrative reference data model for a capital-markets data mesh: reference data (instruments, counterparties, currencies) plus transaction and position facts, modeled with end-to-end data classification.",
+  "classifications": [
+    "public",
+    "internal",
+    "confidential",
+    "restricted"
+  ],
+  "products": [
+    {
+      "id": "counterparty",
+      "title": "Counterparty",
+      "group": "reference",
+      "owner": "reference-data",
+      "descriptor": "catalog/counterparty.json"
+    },
+    {
+      "id": "currency",
+      "title": "Currency",
+      "group": "reference",
+      "owner": "reference-data",
+      "descriptor": "catalog/currency.json"
+    },
+    {
+      "id": "instrument",
+      "title": "Instrument",
+      "group": "reference",
+      "owner": "reference-data",
+      "descriptor": "catalog/instrument.json"
+    },
+    {
+      "id": "position",
+      "title": "Position",
+      "group": "position",
+      "owner": "trading-data",
+      "descriptor": "catalog/position.json"
+    },
+    {
+      "id": "trade",
+      "title": "Trade",
+      "group": "transaction",
+      "owner": "trading-data",
+      "descriptor": "catalog/trade.json"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+entity: instrument
+label: Instrument
+group: reference
+grain: one row per tradable instrument
+owner: reference-data
+source: reference_feed
+
+fields:
+  - name: instrument_id
+    type: string
+    classification: internal
+    pk: true
+    description: Internal surrogate key for the instrument.
+  - name: isin
+    type: string
+    classification: public
+    description: ISIN — public market identifier.
+  - name: cusip
+    type: string
+    classification: public
+    description: CUSIP — public market identifier (North America).
+  - name: name
+    type: string
+    classification: public
+    description: Instrument display name.
+  - name: asset_class
+    type: string
+    classification: public
+    facet: true
+    description: Asset class (EQUITY, BOND, FUND, FX, ...).
+  - name: currency_code
+    type: string
+    classification: public
+    fk: { entity: currency, field: currency_code }
+    description: Trading/denomination currency.
+
+dimensions:
+  - instrument_id
+  - asset_class
+  - currency_code

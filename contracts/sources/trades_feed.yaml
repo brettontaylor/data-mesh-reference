@@ -1,0 +1,12 @@
+source: trades_feed
+kind: csv
+label: Trades & positions feed
+description: Intraday executed trades plus end-of-day position snapshots.
+cadenceDays: 1
+classification: confidential
+produces:
+  - trade
+  - position
+inputs:
+  trade: examples/data/trade.csv
+  position: examples/data/position.csv

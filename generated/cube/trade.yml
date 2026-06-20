@@ -1,0 +1,46 @@
+# AUTO-GENERATED from contracts/entities/trade.yaml — DO NOT EDIT. Regenerate: npm run generate
+cubes:
+  - name: trade
+    sql_table: GOLD.TRADE
+    title: Trade
+    description: one row per executed trade
+    meta:
+      owner: trading-data
+      group: transaction
+    dimensions:
+    - name: trade_date
+      sql: trade_date
+      type: time
+      meta:
+        classification: internal
+    - name: instrument_id
+      sql: instrument_id
+      type: string
+      meta:
+        classification: internal
+    - name: counterparty_id
+      sql: counterparty_id
+      type: string
+      meta:
+        classification: internal
+    - name: side
+      sql: side
+      type: string
+      meta:
+        classification: internal
+    - name: currency_code
+      sql: currency_code
+      type: string
+      meta:
+        classification: public
+    measures:
+    - name: notional_sum
+      sql: notional
+      type: sum
+      meta:
+        classification: confidential
+    - name: trade_count
+      sql: trade_id
+      type: count
+      meta:
+        classification: internal

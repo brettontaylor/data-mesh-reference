@@ -1,0 +1,32 @@
+# =============================================================================
+# Semantic Quay — Data Mesh Reference
+# The governed metadata SPEC: the single source of truth for the data model.
+#
+# Everything downstream is generated from the contracts in this directory:
+#   contracts  ->  Databricks medallion pipelines
+#              ->  Cube semantic models
+#              ->  Snowflake serving DDL
+#              ->  data-product catalog
+#
+# GENERIC & ILLUSTRATIVE. Synthetic capital-markets data only. No real entity,
+# data, or proprietary schema. Adapt freely.
+# =============================================================================
+
+version: "0.1.0"
+name: capital-markets-reference
+description: >-
+  An illustrative reference data model for a capital-markets data mesh:
+  reference data (instruments, counterparties, currencies) plus transaction and
+  position facts, modeled with end-to-end data classification.
+
+# Classification tiers, ordered least -> most sensitive. Every field MUST carry
+# one of these. Governance forbids any field defaulting to the most-open tier.
+classifications:
+  - public # freely shareable reference facts (e.g. ISIN, currency code)
+  - internal # internal-only identifiers and low-sensitivity attributes
+  - confidential # commercially sensitive (prices, notionals, positions)
+  - restricted # personal or highly sensitive (trader identity, risk scores)
+
+# A field with no explicit classification is rejected by governance — there is
+# no permissive default. (See src/governance/checks.ts)
+mostOpenTier: public

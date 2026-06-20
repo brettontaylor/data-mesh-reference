@@ -1,0 +1,67 @@
+{
+  "dataProduct": "position",
+  "title": "Position",
+  "version": "0.1.0",
+  "group": "position",
+  "grain": "one row per book / instrument / as-of date",
+  "owner": "trading-data",
+  "source": {
+    "id": "trades_feed",
+    "kind": "csv",
+    "cadenceDays": 1
+  },
+  "classificationSummary": {
+    "internal": 4,
+    "confidential": 2,
+    "public": 1
+  },
+  "schema": [
+    {
+      "name": "position_id",
+      "type": "string",
+      "classification": "internal",
+      "primaryKey": true
+    },
+    {
+      "name": "book_id",
+      "type": "string",
+      "classification": "internal"
+    },
+    {
+      "name": "instrument_id",
+      "type": "string",
+      "classification": "internal",
+      "references": "instrument.instrument_id"
+    },
+    {
+      "name": "as_of_date",
+      "type": "date",
+      "classification": "internal"
+    },
+    {
+      "name": "quantity",
+      "type": "decimal(18,4)",
+      "classification": "confidential"
+    },
+    {
+      "name": "market_value",
+      "type": "decimal(18,2)",
+      "classification": "confidential"
+    },
+    {
+      "name": "currency_code",
+      "type": "string",
+      "classification": "public",
+      "references": "currency.currency_code"
+    }
+  ],
+  "lineage": {
+    "bronze": "bronze_position",
+    "silver": "silver_position",
+    "gold": "GOLD.POSITION",
+    "semantic": "cube:position"
+  },
+  "metrics": [
+    "market_value_sum"
+  ]
+}

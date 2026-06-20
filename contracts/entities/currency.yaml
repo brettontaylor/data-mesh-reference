@@ -1,0 +1,25 @@
+entity: currency
+label: Currency
+group: reference
+grain: one row per ISO 4217 currency
+owner: reference-data
+source: reference_feed
+
+fields:
+  - name: currency_code
+    type: string
+    classification: public
+    pk: true
+    description: ISO 4217 alphabetic code (e.g. USD, EUR, JPY).
+  - name: name
+    type: string
+    classification: public
+    description: Currency display name.
+  - name: minor_units
+    type: int
+    classification: public
+    description: Number of decimal places in the minor unit.
+
+dimensions:
+  - currency_code
+  - name

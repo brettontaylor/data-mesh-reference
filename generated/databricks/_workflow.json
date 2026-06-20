@@ -1,0 +1,31 @@
+{
+  "name": "capital-markets-reference",
+  "generated_from": "contracts/",
+  "tasks": [
+    {
+      "task_key": "counterparty_pipeline",
+      "notebook": "databricks/counterparty_pipeline.py",
+      "schedule_days": 1
+    },
+    {
+      "task_key": "currency_pipeline",
+      "notebook": "databricks/currency_pipeline.py",
+      "schedule_days": 1
+    },
+    {
+      "task_key": "instrument_pipeline",
+      "notebook": "databricks/instrument_pipeline.py",
+      "schedule_days": 1
+    },
+    {
+      "task_key": "position_pipeline",
+      "notebook": "databricks/position_pipeline.py",
+      "schedule_days": 1
+    },
+    {
+      "task_key": "trade_pipeline",
+      "notebook": "databricks/trade_pipeline.py",
+      "schedule_days": 1
+    }
+  ]
+}

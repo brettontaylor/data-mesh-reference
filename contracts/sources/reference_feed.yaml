@@ -1,0 +1,16 @@
+source: reference_feed
+kind: csv
+label: Reference data feed
+description: Daily reference-data extract (instruments, counterparties, currencies).
+cadenceDays: 1
+classification: internal
+# Entities this source lands into the bronze layer.
+produces:
+  - currency
+  - instrument
+  - counterparty
+# Illustrative local input files (one per produced entity), relative to repo root.
+inputs:
+  currency: examples/data/currency.csv
+  instrument: examples/data/instrument.csv
+  counterparty: examples/data/counterparty.csv

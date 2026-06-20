@@ -1,0 +1,20 @@
+# AUTO-GENERATED from contracts/entities/currency.yaml — DO NOT EDIT. Regenerate: npm run generate
+cubes:
+  - name: currency
+    sql_table: GOLD.CURRENCY
+    title: Currency
+    description: one row per ISO 4217 currency
+    meta:
+      owner: reference-data
+      group: reference
+    dimensions:
+    - name: currency_code
+      sql: currency_code
+      type: string
+      meta:
+        classification: public
+    - name: name
+      sql: name
+      type: string
+      meta:
+        classification: public

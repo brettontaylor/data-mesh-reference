@@ -1,0 +1,6 @@
+counterparty_id,lei,legal_name,country_code,credit_rating,internal_risk_score
+CP-001,7LTWFZYICNSX8D621K86,Meridian Capital Partners,US,A,42
+CP-002,549300LIGFW4PFY1HK29,Northwind Asset Mgmt,GB,AA,18
+CP-003,529900T8BM49AURSDO55,Helvetia Securities,CH,A,55
+CP-004,353800FWHQ8C5G5C9X63,Sakura Investments,JP,BBB,71
+CP-005,984500B1A2C3D4E5F6G7,Atlas Brokerage,US,AA,23

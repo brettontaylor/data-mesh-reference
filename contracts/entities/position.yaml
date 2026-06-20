@@ -1,0 +1,52 @@
+entity: position
+label: Position
+group: position
+grain: one row per book / instrument / as-of date
+owner: trading-data
+source: trades_feed
+
+fields:
+  - name: position_id
+    type: string
+    classification: internal
+    pk: true
+    description: Surrogate key (book_id + instrument_id + as_of_date).
+  - name: book_id
+    type: string
+    classification: internal
+    facet: true
+    description: Trading book / portfolio identifier.
+  - name: instrument_id
+    type: string
+    classification: internal
+    fk: { entity: instrument, field: instrument_id }
+    description: Held instrument.
+  - name: as_of_date
+    type: date
+    classification: internal
+    description: Position snapshot date.
+  - name: quantity
+    type: decimal(18,4)
+    classification: confidential
+    description: Net held quantity.
+  - name: market_value
+    type: decimal(18,2)
+    classification: confidential
+    description: Mark-to-market value.
+  - name: currency_code
+    type: string
+    classification: public
+    fk: { entity: currency, field: currency_code }
+    description: Valuation currency.
+
+metrics:
+  - name: market_value_sum
+    agg: sum
+    field: market_value
+    description: Total mark-to-market exposure.
+
+dimensions:
+  - book_id
+  - instrument_id
+  - as_of_date
+  - currency_code

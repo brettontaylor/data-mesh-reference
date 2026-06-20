@@ -1,0 +1,58 @@
+{
+  "dataProduct": "instrument",
+  "title": "Instrument",
+  "version": "0.1.0",
+  "group": "reference",
+  "grain": "one row per tradable instrument",
+  "owner": "reference-data",
+  "source": {
+    "id": "reference_feed",
+    "kind": "csv",
+    "cadenceDays": 1
+  },
+  "classificationSummary": {
+    "internal": 1,
+    "public": 5
+  },
+  "schema": [
+    {
+      "name": "instrument_id",
+      "type": "string",
+      "classification": "internal",
+      "primaryKey": true
+    },
+    {
+      "name": "isin",
+      "type": "string",
+      "classification": "public"
+    },
+    {
+      "name": "cusip",
+      "type": "string",
+      "classification": "public"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "classification": "public"
+    },
+    {
+      "name": "asset_class",
+      "type": "string",
+      "classification": "public"
+    },
+    {
+      "name": "currency_code",
+      "type": "string",
+      "classification": "public",
+      "references": "currency.currency_code"
+    }
+  ],
+  "lineage": {
+    "bronze": "bronze_instrument",
+    "silver": "silver_instrument",
+    "gold": "GOLD.INSTRUMENT",
+    "semantic": "cube:instrument"
+  },
+  "metrics": []
+}

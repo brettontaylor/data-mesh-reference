@@ -1,0 +1,39 @@
+entity: counterparty
+label: Counterparty
+group: reference
+grain: one row per legal counterparty
+owner: reference-data
+source: reference_feed
+
+fields:
+  - name: counterparty_id
+    type: string
+    classification: internal
+    pk: true
+    description: Internal surrogate key for the counterparty.
+  - name: lei
+    type: string
+    classification: public
+    description: Legal Entity Identifier — public registry id.
+  - name: legal_name
+    type: string
+    classification: confidential
+    description: Counterparty legal name (relationship-sensitive).
+  - name: country_code
+    type: string
+    classification: internal
+    facet: true
+    description: ISO 3166 country of domicile.
+  - name: credit_rating
+    type: string
+    classification: confidential
+    description: External credit rating bucket.
+  - name: internal_risk_score
+    type: int
+    classification: restricted
+    description: Proprietary internal risk score (highly sensitive).
+
+dimensions:
+  - counterparty_id
+  - country_code
+  - credit_rating
