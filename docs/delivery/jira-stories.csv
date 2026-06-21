@@ -1,0 +1,110 @@
+Issue Type,Summary,Epic Name,Epic Link,Description,Acceptance Criteria,Story Points,Priority,Labels,Components,Requirements
+Epic,Platform foundation & monorepo,Platform foundation & monorepo,,"Monorepo, engine, shared libs, CI/CD scaffolding.",,,High,epic,,
+Epic,GitOps spine & projection,GitOps spine & projection,,Git as system of record; Postgres projection; reconciler; read API.,,,High,epic,,
+Epic,"Catalog, publication & consumption","Catalog, publication & consumption",,"Catalog/UI, contracts, SDKs, CLI.",,,High,epic,,
+Epic,"Identity, RBAC & ABAC","Identity, RBAC & ABAC",,"OIDC/SAML, roles, attribute-level access.",,,High,epic,,
+Epic,"Governance, approvals & immutable audit","Governance, approvals & immutable audit",,"ChangeSets, gates, maker/checker, audit.",,,High,epic,,
+Epic,Pipeline orchestration,Pipeline orchestration,,Generate/deploy/run medallion pipelines.,,,High,epic,,
+Epic,Lineage & Unity Catalog integration,Lineage & Unity Catalog integration,,Column lineage + two-way UC sync.,,,High,epic,,
+Epic,"Events, webhooks & subscriptions","Events, webhooks & subscriptions",,"Event bus, webhooks, notifications.",,,High,epic,,
+Epic,"Packaging, hardening & operations","Packaging, hardening & operations",,"Docker/Helm/IaC, security, observability, DR.",,,High,epic,,
+Epic,Compliance packs,Compliance packs,,"GDPR, BCBS 239, retention/legal hold (post-GA).",,,High,epic,,
+Story,Set up monorepo workspace & task runner,,Platform foundation & monorepo,Establish pnpm workspaces + Turborepo + Changesets; shared tsconfig and lint with module-boundary rules.,"1. Workspace builds all packages
+2. Boundary lint fails on illegal cross-imports
+3. Changesets versioning configured",5,High,foundation P0,Platform,NFR-MAINT-001
+Story,"Establish engine package (contracts, generators, registry)",,Platform foundation & monorepo,"House the pure engine: contract types, generators, governance checks, semver, registry.","1. Engine is dependency-light and unit-tested
+2. No engine dependency on HTTP/DB",5,High,foundation P0,Platform,FR-MM-006 NFR-MAINT-001
+Story,Shared config & structured logging,,Platform foundation & monorepo,"Typed config loader (env + file), structured JSON logger with secret/PII redaction.","1. Invalid config fails fast with a clear message
+2. Logs contain no secret/PII values",3,High,foundation P0,Platform,NFR-OPS-001
+Story,"CI pipeline (build, test, scan, SBOM)",,Platform foundation & monorepo,"PR pipeline: typecheck, unit, lint/boundary, SCA + secret scan, SBOM, signed image.","1. CI runs on PR and blocks on failure
+2. SBOM + signed image produced on main",5,High,foundation P0 security,Platform Ops,NFR-SEC-004 NFR-MAINT-002
+Story,Git provider adapter (local + GitLab),,GitOps spine & projection,GitProvider interface with a local filesystem impl and a GitLab REST impl (read path; write path in EP05).,"1. readTree returns the model tree + a content sha
+2. GitLab read path works against a test project",8,High,gitops P1 integration,Data Integration,FR-IN-001
+Story,Postgres projection schema & migrations,,GitOps spine & projection,Forward-only migrations for domain/model/field/version/edge + meta; each record carries source_sha.,"1. Migrations apply cleanly
+2. Records carry source_sha",5,High,gitops P1,Platform,DR-011 NFR-MAINT-003
+Story,"Reconciler (Git → projection, idempotent)",,GitOps spine & projection,Materialize the Git tree into the projection; idempotent; full rebuild from a commit.,"1. Re-running reconcile yields identical projection
+2. Rebuild reproduces projection exactly from a sha",8,High,gitops P1,Platform,FR-IN-002 NFR-DR-001
+Story,"Read API (domains, models, registry, search)",,GitOps spine & projection,Fastify read endpoints over the projection with FTS.,"1. Documented read endpoints respond
+2. Search filters by facets",5,High,gitops P1 api,Platform,FR-CP-001 FR-CN-001
+Story,Seed loader & demo dataset,,GitOps spine & projection,Seed the models repo with a synthetic capital-markets domain for out-of-box exploration.,1. Fresh install is explorable with seeded models,3,Medium,gitops P1,Platform,FR-AD-002
+Story,Drift detection & alerting,,GitOps spine & projection,Detect divergence between Git head and the projection; alert when stale.,1. Out-of-band commit raises a drift alert,3,High,gitops P1 ops,Platform,FR-IN-003
+Story,Catalog & faceted search UI,,"Catalog, publication & consumption","Browse/search models & products with facets (domain, kind, status, classification, PII/MNPI, owner).","1. Search returns filtered results
+2. Facets work as specified",5,High,experience P2 ui,Experience,FR-CP-001 FR-UI-001
+Story,Model/product detail view,,"Catalog, publication & consumption","Schema (with classification + PII/MNPI), versions, lineage refs, owner, contracts.","1. Detail view renders all elements
+2. Contracts are downloadable",5,High,experience P2 ui,Experience,FR-CP-002 FR-CP-003
+Story,Interactive ERD,,"Catalog, publication & consumption","Expandable entities, FK connectors, classification badges, role-aware masking.","1. Entities expand to attributes
+2. FK connectors render between entities",5,Medium,experience P2 ui,Experience,FR-UI-003
+Story,Machine-readable contracts & .well-known,,"Catalog, publication & consumption",Generate JSON Schema/OpenAPI/JSON-LD per model + capability descriptor.,"1. Each artifact is retrievable and valid
+2. /.well-known/dct.json is accurate",5,High,experience P2 api,Experience,FR-CP-003 FR-CP-004
+Story,TypeScript & Python SDKs,,"Catalog, publication & consumption",Typed clients for read endpoints honoring masking.,"1. Both SDKs round-trip reads
+2. Masking respected in SDK responses",5,High,experience P2 sdk,Experience,FR-CN-003
+Story,"CLI (validate, diff, propose, simulate, generate, pipeline, lineage)",,"Catalog, publication & consumption",Operator/CI CLI wrapping engine + API.,"1. Each command performs its function
+2. CLI usable in CI",5,High,experience P2 cli,Experience,FR-CN-004
+Story,OIDC/SAML login & sessions,,"Identity, RBAC & ABAC",Authenticate via corporate IdP; short-lived sessions; logout.,"1. SSO login works
+2. Sessions expire and refresh",8,High,security P3 auth,Governance & Security,FR-IN-006 CR-040
+Story,API keys / service principals,,"Identity, RBAC & ABAC","Issue scoped, hashed, revocable machine credentials.","1. Keys are scoped + revocable
+2. Keys hashed at rest, shown once",5,High,security P3 auth,Governance & Security,FR-IN-006 NFR-SEC-006
+Story,RBAC capabilities & group→role mapping,,"Identity, RBAC & ABAC",Roles from IdP groups; capability checks on endpoints; domain scoping.,"1. Each role grants only its capabilities
+2. Domain-scoped roles enforced",5,High,security P3 auth,Governance & Security,FR-AX-004 FR-AX-005
+Story,ABAC attribute-level masking engine,,"Identity, RBAC & ABAC","Enforce tier + PII + MNPI per attribute across API, semantic, catalog.","1. Masking matches the decision rule across roles
+2. Masked measures are not computable",8,High,security P3,Governance & Security,FR-AX-002 FR-AX-003 FR-AX-006 DR-022
+Story,Row-Level Security (defence in depth),,"Identity, RBAC & ABAC",Postgres RLS enforcing domain + clearance on read models.,1. Direct SQL cannot bypass scoping,5,High,security P3,Governance & Security,NFR-SEC-003 CR-041
+Story,"Admin: IdP config, role mapping, domains",,"Identity, RBAC & ABAC",Admin surfaces for identity/role/domain configuration.,1. Config changes take effect without code changes,3,High,security P3 admin,Governance & Security,FR-AD-001
+Story,ChangeSet model & lifecycle state machine,,"Governance, approvals & immutable audit",Proposal wrapping edits with diff/impact/gates/approvals; draft→in_review→approved→merged/rejected.,"1. A ChangeSet exposes diff, impact, gates, approvals
+2. Invalid transitions rejected",8,High,governance P4,Governance & Security,FR-GV-001 FR-MM-010
+Story,Automated gates pipeline,,"Governance, approvals & immutable audit","Run schema, referential, classification, semver, propagation gates on each ChangeSet.","1. Each gate returns pass/fail with detail
+2. Approval blocked while a required gate fails",8,High,governance P4,Governance & Security,FR-GV-002 FR-GV-003
+Story,Maker/checker + SoD + quorum,,"Governance, approvals & immutable audit",No self-approval; risk-based quorum; PII/MNPI/policy governance escalation.,"1. Self-approval/merge rejected
+2. Quorum + escalation enforced",8,High,governance P4,Governance & Security,FR-GV-004 FR-GV-005 FR-GV-006 CR-001 CR-002
+Story,Immutable hash-chained audit log,,"Governance, approvals & immutable audit",Append-only audit with chain verifier and SIEM stream.,"1. Chain verifies; tampering detectable
+2. Events stream to SIEM",8,High,governance P4 security,Governance & Security,FR-GV-009 NFR-AUD-001 NFR-AUD-002
+Story,Git write path (branch/commit/MR/merge),,"Governance, approvals & immutable audit",Implement the GitLab write path; merge gate re-verified server-side.,"1. Propose opens an MR; approved MR merges
+2. Server-side gate re-verifies at merge",8,High,governance P4 integration,Governance & Security,FR-IN-001 FR-GV-008
+Story,ChangeSet review UI,,"Governance, approvals & immutable audit","Side-by-side diff, classification deltas, impact tree, gate status, approvals.","1. Review surface renders all elements
+2. Approve/reject with SoD enforced",5,High,governance P4 ui,Experience,FR-GV-007 FR-UI-001
+Story,Models-repo CI & branch protection,,"Governance, approvals & immutable audit",Reusable CI that runs gates on direct MRs; branch-protection templates.,"1. Direct MRs are gated
+2. No-self-approve enforced in Git",5,High,governance P4,Governance & Security,FR-GV-011
+Story,Impact analysis & breaking-change acknowledgement,,"Governance, approvals & immutable audit",Compute downstream impact; require ack for breaking changes with subscribers.,1. Impact shown; ack required to proceed,5,Medium,governance P4,Governance & Security,FR-GV-012 FR-LN-004
+Story,Break-glass emergency change,,"Governance, approvals & immutable audit",Dual-admin override with reason + time-box + high-severity audit.,"1. Break-glass recorded distinctly + alerts
+2. Single-admin attempts fail",3,Medium,governance P4 security,Governance & Security,FR-GV-010 CR-004
+Story,Orchestration adapter (local + Databricks),,Pipeline orchestration,Orchestrator interface; local in-process medallion; Databricks Workflows/DLT via Asset Bundles.,"1. Local adapter runs the medallion in CI
+2. Databricks adapter targets a workspace",8,High,orchestration P5 integration,Data Integration,FR-OR-001 FR-OR-002
+Story,Deploy / trigger / monitor pipelines,,Pipeline orchestration,Idempotent deploy; on-demand/scheduled/on-merge triggers; run tracking + metrics.,"1. Re-deploy is a no-op for unchanged
+2. Runs tracked with metrics",8,High,orchestration P5,Data Integration,FR-OR-003 FR-OR-004 FR-OR-005
+Story,DQ expectations from contracts,,Pipeline orchestration,Generate DLT expectations from DQ contracts; surface results on runs.,1. DQ pass/fail appears on runs,5,Medium,orchestration P5,Data Integration,FR-OR-006 FR-MM-009
+Story,Environments & four-eyes prod deploy,,Pipeline orchestration,dev/staging/prod targets + promotion; distinct approver required for prod.,"1. Promotion deploys identical assets per target
+2. Prod deploy without distinct approver rejected",5,High,orchestration P5 security,Data Integration,FR-OR-007 FR-OR-008
+Story,Pipeline console UI,,Pipeline orchestration,"List pipelines, schedules, run history + run detail.",1. Console shows pipelines and runs with metrics,5,Medium,orchestration P5 ui,Experience,FR-UI-001 FR-OR-005
+Story,"Resilience: retry, circuit-break, alert",,Pipeline orchestration,"Bounded retries, circuit-breaking on poison runs, alerting.",1. Repeated failures circuit-break + alert,3,Medium,orchestration P5 ops,Data Integration,FR-OR-009 NFR-AVAIL-002
+Story,Column-level static lineage,,Lineage & Unity Catalog integration,Build lineage from the models (source→bronze→silver→gold.col→semantic).,1. Lineage resolves the full chain for a field,5,High,lineage P6,Data Integration,FR-LN-001
+Story,OpenLineage ingestion & reconciliation,,Lineage & Unity Catalog integration,Ingest run events; mark observed edges; reconcile vs static.,1. Edges marked observed after a run,5,High,lineage P6 integration,Data Integration,FR-LN-002
+Story,"Lineage traversal, impact & explorer UI",,Lineage & Unity Catalog integration,"Upstream/downstream traversal, impact analysis, interactive explorer.","1. Traversal + impact correct
+2. Explorer renders the graph",5,High,lineage P6 ui,Experience,FR-LN-003 FR-LN-004 FR-LN-005
+Story,Unity Catalog push (schemas/tags/masks),,Lineage & Unity Catalog integration,"Project models into UC: schemas, classification/PII/MNPI tags, column masks, ownership.","1. Applied tags/masks match the model
+2. Plan is generatable without a workspace",8,High,uc P6 integration,Data Integration,FR-IN-004
+Story,Unity Catalog pull/import & reconcile,,Lineage & Unity Catalog integration,Import existing UC estate as candidate models; detect & remediate drift.,"1. Import produces candidate models
+2. Drift detected + remediable",5,Medium,uc P6 integration,Data Integration,FR-IN-005 FR-IN-003
+Story,Event bus & transactional outbox,,"Events, webhooks & subscriptions",Domain events with an outbox; in-process subscribers.,"1. State-changing actions emit events
+2. Outbox guarantees delivery",5,High,events P7,Platform,FR-IN-008
+Story,"Webhook delivery (HMAC, retry, DLQ, replay)",,"Events, webhooks & subscriptions","Signed delivery with retries, dead-letter, and replay.","1. Subscriber receives a signed event
+2. Failures DLQ and can be replayed",5,High,events P7 integration,Platform,FR-IN-008 CR-045
+Story,Subscriptions & breaking-change notifications,,"Events, webhooks & subscriptions",Subscribe to products/event types; notify subscribers before a breaking merge.,1. Subscriber notified of a breaking change,3,Medium,events P7,Platform,FR-GV-012 FR-IN-008
+Story,Notification channels (email/Slack/Teams/in-app),,"Events, webhooks & subscriptions","Adapter-based notifications for reviews, decisions, SLA breaches.",1. Notifications delivered via configured channel,3,Low,events P7,Platform,FR-IN-008
+Story,Container image & docker-compose,,"Packaging, hardening & operations",Multi-role image (api/web/worker/all) + one-command compose stack.,1. docker compose up brings up a working stack,5,High,ops P8,Platform Ops,NFR-PORT-001 NFR-PORT-002
+Story,Helm chart & k8s deploy,,"Packaging, hardening & operations","HA deployments, services, ingress, probes, secret refs, HPA.",1. helm install deploys api/web/worker with probes,5,High,ops P8,Platform Ops,NFR-PORT-001 NFR-SCALE-001
+Story,Databricks App bundle,,"Packaging, hardening & operations",Package the image as a Databricks App for in-perimeter deploy.,1. App deploys inside a workspace,3,Medium,ops P8,Platform Ops,NFR-PORT-001
+Story,Terraform (UC namespaces + service principal),,"Packaging, hardening & operations",IaC for the data-plane side the platform governs.,1. terraform apply provisions catalogs + SP,3,Medium,ops P8 iac,Platform Ops,FR-AD-001
+Story,Observability dashboards & alerts,,"Packaging, hardening & operations",OTel traces/metrics/logs; golden-signal + domain dashboards; alert rules.,"1. Dashboards display the listed metrics
+2. Alerts fire on threshold breach",5,High,ops P8,Platform Ops,NFR-OPS-002 NFR-OPS-003
+Story,"Backup, restore & DR drill",,"Packaging, hardening & operations",PITR backups incl. audit chain; tested restore; chaos drills.,"1. Restore drill passes; audit chain verified
+2. Dependency-outage drill degrades gracefully",5,High,ops P8 security,Platform Ops,NFR-DR-002 NFR-AVAIL-002
+Story,Security hardening & threat-model review,,"Packaging, hardening & operations","Pen-test fixes, STRIDE review, egress allow-listing, image signing.","1. Threat model reviewed; mitigations tracked
+2. Security checklist green",5,High,ops P8 security,Governance & Security,CR-044 NFR-SEC-004
+Story,First-run wizard & runbooks,,"Packaging, hardening & operations","Guided setup; operational runbooks (drift, rotation, break-glass, restore, onboarding).","1. Clean-room install < 1 hr
+2. Runbooks followed in a drill",3,High,ops P8 docs,Platform Ops,FR-AD-002 NFR-OPS-004
+Story,"Privacy pack (purpose tags, RTBF, residency)",,Compliance packs,Purpose/lawful-basis tags; RTBF lineage propagation; residency-constrained deploys.,"1. RTBF produces a target list via lineage
+2. Region-tagged products deploy only to matching regions",8,Low,compliance P9 privacy,Governance & Security,CR-021 CR-022 DR-025 DR-026
+Story,BCBS 239 evidence pack,,Compliance packs,Lineage-completeness scoring; DQ evidence bundles; ownership coverage.,"1. Coverage metric per domain
+2. Evidence bundle exports",5,Low,compliance P9,Governance & Security,CR-010 CR-011 CR-013
+Story,Retention & legal hold,,Compliance packs,Configurable retention; WORM/legal-hold immutability; e-discovery export.,"1. Retention applied; held records immutable
+2. Signed e-discovery export",5,Low,compliance P9,Governance & Security,CR-030 CR-031
