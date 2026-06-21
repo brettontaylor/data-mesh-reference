@@ -60,6 +60,7 @@ export interface ChangeSet {
   gates: Gate[];
   impact: string[];
   requiresGovernance: boolean;
+  requiresEnterpriseSignoff: boolean; // federated routing → CDA / ARB sign-off
   requiredApprovals: number;
   approvals: Approval[];
   createdAt: string;
@@ -182,7 +183,19 @@ export class GovernanceService {
 
     const requiresGovernance = this.sensitivityEscalation(current, input.edits);
     const maxSeverity = diff.reduce((acc, d) => Math.max(acc, levelRank(d.requiredBump as never)), 0);
-    const requiredApprovals = (maxSeverity >= 3 ? 2 : 1) + (requiresGovernance ? 1 : 0);
+    const isMajor = maxSeverity >= 3;
+    // Federated routing (FR-FG-021): CDA / ARB enterprise sign-off is required when a
+    // change touches a BDM, is breaking/major, introduces a new entity, or alters
+    // classification (cross-domain & shared-scope add further triggers as the model grows).
+    const anyBdm = input.edits.some((e) => e.kind === "bdm");
+    const currentIds = new Set([
+      ...current.entities.map((e) => e.entity),
+      ...current.pdms.map((p) => p.pdm),
+      ...current.semanticModels.map((s) => s.semanticModel),
+    ]);
+    const newEntity = input.edits.some((e) => !currentIds.has(e.id));
+    const requiresEnterpriseSignoff = anyBdm || isMajor || newEntity || requiresGovernance;
+    const requiredApprovals = isMajor ? 2 : 1; // domain-tier quorum
 
     const cs: ChangeSet = {
       id: randomUUID(),
@@ -194,6 +207,7 @@ export class GovernanceService {
       gates,
       impact,
       requiresGovernance,
+      requiresEnterpriseSignoff,
       requiredApprovals,
       approvals: [],
       createdAt: this.now(),
@@ -202,7 +216,7 @@ export class GovernanceService {
     await this.audit.append({
       ts: this.now(), actor: principal.sub, actorRoles: principal.roles,
       action: "change.propose", subject: `dct:changeset:${cs.id}`,
-      payload: { title: cs.title, edits: input.edits.map((e) => `${e.kind}:${e.id}`), requiresGovernance, requiredApprovals },
+      payload: { title: cs.title, edits: input.edits.map((e) => `${e.kind}:${e.id}`), requiresGovernance, requiresEnterpriseSignoff, requiredApprovals },
     });
     return cs;
   }
@@ -234,9 +248,18 @@ export class GovernanceService {
     if (decision === "reject") {
       cs.status = "rejected";
     } else {
-      const approvals = cs.approvals.filter((a) => a.decision === "approve");
-      const hasGovernance = approvals.some((a) => a.roles.includes("governance"));
-      const met = approvals.length >= cs.requiredApprovals && (!cs.requiresGovernance || hasGovernance);
+      const appr = cs.approvals.filter((a) => a.decision === "approve");
+      // Tier 1 — domain quorum (stewards / domain owners).
+      const domain = appr.filter((a) => a.roles.some((r) => r === "steward" || r === "domain_owner"));
+      // Tier 2 — enterprise sign-off (Chief Data Architect / ARB / admin).
+      const enterprise = appr.filter((a) =>
+        a.roles.some((r) => r === "chief_data_architect" || r === "architecture_review_board" || r === "admin"),
+      );
+      const hasGovernance = appr.some((a) => a.roles.includes("governance"));
+      const met =
+        domain.length >= cs.requiredApprovals &&
+        (!cs.requiresGovernance || hasGovernance) &&
+        (!cs.requiresEnterpriseSignoff || enterprise.length >= 1);
       if (met) cs.status = "approved";
     }
     return cs;

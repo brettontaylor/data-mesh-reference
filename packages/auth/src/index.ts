@@ -7,6 +7,7 @@ export type Capability =
   | "catalog:read"
   | "model:propose"
   | "change:approve"
+  | "change:signoff" // enterprise (CDA/ARB) sign-off
   | "change:merge"
   | "pipeline:deploy"
   | "governance:admin"
@@ -20,6 +21,8 @@ export type Role =
   | "domain_owner"
   | "platform_engineer"
   | "governance"
+  | "chief_data_architect" // enterprise sign-off authority
+  | "architecture_review_board" // delegated enterprise sign-off (quorum)
   | "admin";
 
 export interface Clearance {
@@ -43,8 +46,10 @@ const ROLE_CAPS: Record<Role, Capability[]> = {
   domain_owner: ["catalog:read", "model:propose", "change:approve", "change:merge"],
   platform_engineer: ["catalog:read", "pipeline:deploy"],
   governance: ["catalog:read", "change:approve", "governance:admin", "audit:read"],
+  chief_data_architect: ["catalog:read", "change:approve", "change:signoff", "governance:admin", "audit:read"],
+  architecture_review_board: ["catalog:read", "change:approve", "change:signoff"],
   admin: [
-    "catalog:read", "model:propose", "change:approve", "change:merge",
+    "catalog:read", "model:propose", "change:approve", "change:signoff", "change:merge",
     "pipeline:deploy", "governance:admin", "audit:read", "admin",
   ],
 };
@@ -56,6 +61,8 @@ const ROLE_CLEARANCE: Record<Role, Clearance> = {
   domain_owner: { maxTier: "confidential", pii: true, mnpi: true },
   platform_engineer: { maxTier: "confidential", pii: false, mnpi: true },
   governance: { maxTier: "restricted", pii: true, mnpi: true },
+  chief_data_architect: { maxTier: "restricted", pii: true, mnpi: true },
+  architecture_review_board: { maxTier: "confidential", pii: true, mnpi: true },
   admin: { maxTier: "restricted", pii: true, mnpi: true },
 };
 

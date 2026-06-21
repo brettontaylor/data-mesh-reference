@@ -32,45 +32,48 @@ console.log("\n— Scenario A: breaking change WITHOUT adequate version bump —
   ok(r.status === 200 && semver && semver.ok === false, `semver gate fails on unbumped breaking change (${semver?.detail ?? "?"})`);
 }
 
-console.log("\n— Scenario B: correct major bump → maker/checker + SoD + quorum(2) —");
-let csB;
+console.log("\n— Scenario B: BDM major change → domain quorum(2) + Chief Data Architect sign-off —");
 {
   const spec = await getTrade();
   spec.fields.find((f) => f.name === "price").type = "decimal(20,6)";
   spec.version = "3.0.0"; // correct major bump
   const r = await call("POST", "/api/v1/changesets", "sam", "steward", { title: "widen price", edits: [{ kind: "bdm", id: "trade", spec }] });
-  csB = r.json.id;
+  const cs = r.json.id;
   ok(r.status === 200 && r.json.gates.every((g) => g.ok), "gates green on correct bump");
-  ok(r.json.requiredApprovals === 2, `major change requires 2 approvals (got ${r.json.requiredApprovals})`);
+  ok(r.json.requiredApprovals === 2, `major needs 2 domain approvals (got ${r.json.requiredApprovals})`);
+  ok(r.json.requiresEnterpriseSignoff === true, "BDM change routed to Chief Data Architect sign-off");
 
-  const self = await call("POST", `/api/v1/changesets/${csB}/approve`, "sam", "steward");
-  ok(self.status === 403, `self-approval blocked by SoD (${self.json.error})`);
+  const self = await call("POST", `/api/v1/changesets/${cs}/approve`, "sam", "steward");
+  ok(self.status === 403, "self-approval blocked by SoD");
 
-  const a1 = await call("POST", `/api/v1/changesets/${csB}/approve`, "sue", "steward");
-  ok(a1.status === 200 && a1.json.status === "in_review", "1st approval recorded, still in_review");
-  const a2 = await call("POST", `/api/v1/changesets/${csB}/approve`, "sara", "steward");
-  ok(a2.status === 200 && a2.json.status === "approved", "2nd approval meets quorum → approved");
+  await call("POST", `/api/v1/changesets/${cs}/approve`, "sue", "steward");
+  const a2 = await call("POST", `/api/v1/changesets/${cs}/approve`, "sara", "steward");
+  ok(a2.json.status === "in_review", "domain quorum met but NOT approved without CDA sign-off");
+  const cda = await call("POST", `/api/v1/changesets/${cs}/approve`, "cara", "chief_data_architect");
+  ok(cda.json.status === "approved", "Chief Data Architect sign-off → approved");
 
-  const m = await call("POST", `/api/v1/changesets/${csB}/merge`, "odette", "domain_owner");
+  const m = await call("POST", `/api/v1/changesets/${cs}/merge`, "odette", "domain_owner");
   ok(m.status === 200 && m.json.status === "merged", "merged by domain_owner");
-
   const t = await getTrade();
   ok(t.version === "3.0.0", `projection reflects trade@3.0.0 after merge (got ${t.version})`);
 }
 
-console.log("\n— Scenario C: adding PII forces +1 governance approval —");
+console.log("\n— Scenario C: PII change → domain + governance + CDA sign-off all required —");
 {
   const spec = await getTrade(); // now 3.0.0
   spec.fields.find((f) => f.name === "side").pii = true; // sensitivity escalation
   spec.version = "4.0.0";
   const r = await call("POST", "/api/v1/changesets", "sam", "steward", { title: "tag side as PII", edits: [{ kind: "bdm", id: "trade", spec }] });
-  const csC = r.json.id;
+  const cs = r.json.id;
   ok(r.json.requiresGovernance === true, "PII change flagged requiresGovernance");
-  await call("POST", `/api/v1/changesets/${csC}/approve`, "sue", "steward");
-  const two = await call("POST", `/api/v1/changesets/${csC}/approve`, "sara", "steward");
-  ok(two.json.status === "in_review", "two steward approvals NOT enough without governance");
-  const gov = await call("POST", `/api/v1/changesets/${csC}/approve`, "gail", "governance");
-  ok(gov.json.status === "approved", "governance approval unlocks → approved");
+  ok(r.json.requiresEnterpriseSignoff === true, "PII change requires CDA sign-off");
+  await call("POST", `/api/v1/changesets/${cs}/approve`, "sue", "steward");
+  const two = await call("POST", `/api/v1/changesets/${cs}/approve`, "sara", "steward");
+  ok(two.json.status === "in_review", "domain quorum alone not enough");
+  const gov = await call("POST", `/api/v1/changesets/${cs}/approve`, "gail", "governance");
+  ok(gov.json.status === "in_review", "governance approval alone still not enough (CDA pending)");
+  const cda = await call("POST", `/api/v1/changesets/${cs}/approve`, "cara", "chief_data_architect");
+  ok(cda.json.status === "approved", "CDA sign-off unlocks → approved");
 }
 
 console.log("\n— Immutable audit —");
