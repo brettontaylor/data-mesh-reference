@@ -23,9 +23,8 @@ ENV NODE_ENV=production
 COPY --from=build /app /app
 COPY deploy/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENV ROLE=all PORT=4400
+ENV ROLE=all
 EXPOSE 4400 4500
-# Health: api /health, web /
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 \
-  CMD node -e "fetch('http://localhost:'+(process.env.PORT||4400)+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+# (Per-role healthchecks are configured by the platform — Railway healthcheckPath,
+#  k8s probes on /health for api and / for web.)
 ENTRYPOINT ["/entrypoint.sh"]
