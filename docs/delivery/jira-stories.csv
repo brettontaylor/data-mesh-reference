@@ -9,6 +9,7 @@ Epic,Lineage & Unity Catalog integration,Lineage & Unity Catalog integration,,Co
 Epic,"Events, webhooks & subscriptions","Events, webhooks & subscriptions",,"Event bus, webhooks, notifications.",,,High,epic,,
 Epic,"Packaging, hardening & operations","Packaging, hardening & operations",,"Docker/Helm/IaC, security, observability, DR.",,,High,epic,,
 Epic,Compliance packs,Compliance packs,,"GDPR, BCBS 239, retention/legal hold (post-GA).",,,High,epic,,
+Epic,Federated operating model & enterprise sign-off,Federated operating model & enterprise sign-off,,Domain ownership; Chief Data Architect / ARB sign-off; scope-aware approval routing.,,,High,epic,,
 Story,Set up monorepo workspace & task runner,,Platform foundation & monorepo,Establish pnpm workspaces + Turborepo + Changesets; shared tsconfig and lint with module-boundary rules.,"1. Workspace builds all packages
 2. Boundary lint fails on illegal cross-imports
 3. Changesets versioning configured",5,High,foundation P0,Platform,NFR-MAINT-001
@@ -108,3 +109,26 @@ Story,BCBS 239 evidence pack,,Compliance packs,Lineage-completeness scoring; DQ 
 2. Evidence bundle exports",5,Low,compliance P9,Governance & Security,CR-010 CR-011 CR-013
 Story,Retention & legal hold,,Compliance packs,Configurable retention; WORM/legal-hold immutability; e-discovery export.,"1. Retention applied; held records immutable
 2. Signed e-discovery export",5,Low,compliance P9,Governance & Security,CR-030 CR-031
+Story,Domain ownership model (domain.yaml / CODEOWNERS / groups),,Federated operating model & enterprise sign-off,Make domains first-class; map Git paths + IdP groups to domain steward roles; every model has an owning domain.,"1. A model resolves its domain + steward group
+2. Reviewers auto-route to the owning domain
+3. Ownerless models reported",5,High,federation P3,Governance & Security,FR-FG-001 FR-FG-002 FR-FG-003
+Story,Chief Data Architect & ARB roles,,Federated operating model & enterprise sign-off,Add chief_data_architect (enterprise sign-off + standards admin) and architecture_review_board (delegated quorum) roles.,"1. CDA can sign off any domain's enterprise change
+2. ARB quorum can sign off when delegated
+3. Domain stewards remain domain-scoped",5,High,federation P3 auth,Governance & Security,FR-FG-010 FR-FG-011 FR-FG-012
+Story,Model scope & conformed-model protection,,Federated operating model & enterprise sign-off,Add scope (domain/shared/enterprise) to the model envelope; shared/enterprise models are CDA-governed.,"1. Scope persists and drives routing
+2. Only CDA/ARB can evolve shared/enterprise models",5,High,federation P4,Governance & Security,FR-FG-004 FR-FG-032
+Story,Scope-aware approval routing engine,,Federated operating model & enterprise sign-off,Configurable policy computing required approvers from kind/severity/scope/classification/cross-domain; CDA sign-off for BDM/major/cross-domain/new-entity/classification/shared.,"1. Each trigger condition requires CDA sign-off
+2. Routine in-domain change is domain-tier only
+3. Policy changes without code changes
+4. SoD enforced at every tier",8,High,federation P4,Governance & Security,FR-FG-020 FR-FG-021 FR-FG-022 FR-FG-013
+Story,Enterprise sign-off tier & CDA review queue,,Federated operating model & enterprise sign-off,Escalate qualifying ChangeSets to the CDA after domain approval; dashboard of pending enterprise sign-offs with scope/impact/gates; SLA + escalation.,"1. Qualifying change cannot merge without CDA sign-off
+2. CDA sees all pending enterprise approvals
+3. Stale sign-offs escalate per policy",8,High,federation P4 ui,Governance & Security,FR-FG-023 FR-FG-024 FR-FG-025
+Story,Standards-as-code & duplication detection,,Federated operating model & enterprise sign-off,"Enterprise modeling standards as automated gates (naming, classification, semver, cross-domain integrity); flag entities overlapping conformed models.","1. Non-compliant change fails the relevant gate
+2. A near-duplicate entity raises a reuse warning",5,Medium,federation P4,Governance & Security,FR-FG-030 FR-FG-031
+Story,Two-tier federated audit & evidence,,Federated operating model & enterprise sign-off,"Record domain proposer, domain approver(s), and CDA sign-off; per-change evidence bundle of the federated chain.","1. Audit shows both tiers for a governed change
+2. Evidence bundle exports the full approval chain",3,High,federation P4 security,Governance & Security,FR-FG-040 FR-FG-041
+Story,Graduated autonomy / delegation,,Federated operating model & enterprise sign-off,Let the CDA delegate change classes to the domain tier over time; recorded and audited.,"1. A delegated class no longer requires CDA sign-off
+2. Delegation is audited",3,Low,federation P9,Governance & Security,FR-FG-026
+Story,Federation registry & domains UI,,Federated operating model & enterprise sign-off,"Catalog of domains, owners, conformed/shared models, and pending sign-offs.","1. Registry lists domains, owners, shared models
+2. Pending enterprise sign-offs visible",3,Medium,federation P6 ui,Experience,FR-FG-005

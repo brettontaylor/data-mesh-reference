@@ -33,6 +33,7 @@ team prove coverage: every requirement is realized by a phase and tracked by a s
 | DCT-EP08 | Events, webhooks & subscriptions |
 | DCT-EP09 | Packaging, security hardening & operations |
 | DCT-EP10 | Compliance packs (privacy, BCBS 239, retention) |
+| DCT-EP11 | Federated operating model & enterprise (CDA) sign-off |
 
 ## 6.3 Requirement → phase → epic
 
@@ -52,6 +53,7 @@ team prove coverage: every requirement is realized by a phase and tracked by a s
 | NFR Non-functional | P0, P8 (cross-cutting) | DCT-EP01, DCT-EP09 |
 | CR Change control / audit | P4 | DCT-EP05 |
 | CR Lineage/DQ, privacy, retention | P6, P9 | DCT-EP07, DCT-EP10 |
+| FR-FG Federated governance (domain ownership, CDA sign-off, routing) | P3–P4 | DCT-EP11 (with DCT-EP04, DCT-EP05) |
 
 ## 6.4 Coverage check
 

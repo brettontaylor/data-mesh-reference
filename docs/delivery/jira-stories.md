@@ -2,7 +2,7 @@
 
 Import `jira-stories.csv` into Jira (map **Epic Link** to Epic Name; **Story Points**, **Priority**, **Labels**, **Components** map directly). Below is the readable backlog. Priority shown as MoSCoW → Jira priority.
 
-**10 epics · 57 stories · 302 story points**
+**11 epics · 66 stories · 347 story points**
 
 ## DCT-EP01 — Platform foundation & monorepo
 
@@ -484,4 +484,85 @@ _GDPR, BCBS 239, retention/legal hold (post-GA)._  (3 stories · 18 pts)
   - Retention applied; held records immutable
   - Signed e-discovery export
 - **Requirements:** CR-030, CR-031
+
+## DCT-EP11 — Federated operating model & enterprise sign-off
+
+_Domain ownership; Chief Data Architect / ARB sign-off; scope-aware approval routing._  (9 stories · 45 pts)
+
+### Domain ownership model (domain.yaml / CODEOWNERS / groups)
+- **Priority:** M (High)  ·  **Points:** 5  ·  **Component:** Governance & Security  ·  **Labels:** federation, P3
+- **Description:** Make domains first-class; map Git paths + IdP groups to domain steward roles; every model has an owning domain.
+- **Acceptance criteria:**
+  - A model resolves its domain + steward group
+  - Reviewers auto-route to the owning domain
+  - Ownerless models reported
+- **Requirements:** FR-FG-001, FR-FG-002, FR-FG-003
+
+### Chief Data Architect & ARB roles
+- **Priority:** M (High)  ·  **Points:** 5  ·  **Component:** Governance & Security  ·  **Labels:** federation, P3, auth
+- **Description:** Add chief_data_architect (enterprise sign-off + standards admin) and architecture_review_board (delegated quorum) roles.
+- **Acceptance criteria:**
+  - CDA can sign off any domain's enterprise change
+  - ARB quorum can sign off when delegated
+  - Domain stewards remain domain-scoped
+- **Requirements:** FR-FG-010, FR-FG-011, FR-FG-012
+
+### Model scope & conformed-model protection
+- **Priority:** M (High)  ·  **Points:** 5  ·  **Component:** Governance & Security  ·  **Labels:** federation, P4
+- **Description:** Add scope (domain/shared/enterprise) to the model envelope; shared/enterprise models are CDA-governed.
+- **Acceptance criteria:**
+  - Scope persists and drives routing
+  - Only CDA/ARB can evolve shared/enterprise models
+- **Requirements:** FR-FG-004, FR-FG-032
+
+### Scope-aware approval routing engine
+- **Priority:** M (High)  ·  **Points:** 8  ·  **Component:** Governance & Security  ·  **Labels:** federation, P4
+- **Description:** Configurable policy computing required approvers from kind/severity/scope/classification/cross-domain; CDA sign-off for BDM/major/cross-domain/new-entity/classification/shared.
+- **Acceptance criteria:**
+  - Each trigger condition requires CDA sign-off
+  - Routine in-domain change is domain-tier only
+  - Policy changes without code changes
+  - SoD enforced at every tier
+- **Requirements:** FR-FG-020, FR-FG-021, FR-FG-022, FR-FG-013
+
+### Enterprise sign-off tier & CDA review queue
+- **Priority:** M (High)  ·  **Points:** 8  ·  **Component:** Governance & Security  ·  **Labels:** federation, P4, ui
+- **Description:** Escalate qualifying ChangeSets to the CDA after domain approval; dashboard of pending enterprise sign-offs with scope/impact/gates; SLA + escalation.
+- **Acceptance criteria:**
+  - Qualifying change cannot merge without CDA sign-off
+  - CDA sees all pending enterprise approvals
+  - Stale sign-offs escalate per policy
+- **Requirements:** FR-FG-023, FR-FG-024, FR-FG-025
+
+### Standards-as-code & duplication detection
+- **Priority:** S (Medium)  ·  **Points:** 5  ·  **Component:** Governance & Security  ·  **Labels:** federation, P4
+- **Description:** Enterprise modeling standards as automated gates (naming, classification, semver, cross-domain integrity); flag entities overlapping conformed models.
+- **Acceptance criteria:**
+  - Non-compliant change fails the relevant gate
+  - A near-duplicate entity raises a reuse warning
+- **Requirements:** FR-FG-030, FR-FG-031
+
+### Two-tier federated audit & evidence
+- **Priority:** M (High)  ·  **Points:** 3  ·  **Component:** Governance & Security  ·  **Labels:** federation, P4, security
+- **Description:** Record domain proposer, domain approver(s), and CDA sign-off; per-change evidence bundle of the federated chain.
+- **Acceptance criteria:**
+  - Audit shows both tiers for a governed change
+  - Evidence bundle exports the full approval chain
+- **Requirements:** FR-FG-040, FR-FG-041
+
+### Graduated autonomy / delegation
+- **Priority:** C (Low)  ·  **Points:** 3  ·  **Component:** Governance & Security  ·  **Labels:** federation, P9
+- **Description:** Let the CDA delegate change classes to the domain tier over time; recorded and audited.
+- **Acceptance criteria:**
+  - A delegated class no longer requires CDA sign-off
+  - Delegation is audited
+- **Requirements:** FR-FG-026
+
+### Federation registry & domains UI
+- **Priority:** S (Medium)  ·  **Points:** 3  ·  **Component:** Experience  ·  **Labels:** federation, P6, ui
+- **Description:** Catalog of domains, owners, conformed/shared models, and pending sign-offs.
+- **Acceptance criteria:**
+  - Registry lists domains, owners, shared models
+  - Pending enterprise sign-offs visible
+- **Requirements:** FR-FG-005
 

@@ -12,6 +12,7 @@ const epics = [
   ["DCT-EP08", "Events, webhooks & subscriptions", "Event bus, webhooks, notifications."],
   ["DCT-EP09", "Packaging, hardening & operations", "Docker/Helm/IaC, security, observability, DR."],
   ["DCT-EP10", "Compliance packs", "GDPR, BCBS 239, retention/legal hold (post-GA)."],
+  ["DCT-EP11", "Federated operating model & enterprise sign-off", "Domain ownership; Chief Data Architect / ARB sign-off; scope-aware approval routing."],
 ];
 
 // story: [epic, summary, description, [AC...], points, MoSCoW, [labels], component, [reqs...]]
@@ -95,6 +96,17 @@ const stories = [
   S("DCT-EP10","Privacy pack (purpose tags, RTBF, residency)","Purpose/lawful-basis tags; RTBF lineage propagation; residency-constrained deploys.",["RTBF produces a target list via lineage","Region-tagged products deploy only to matching regions"],8,"C",["compliance","P9","privacy"],"Governance & Security",["CR-021","CR-022","DR-025","DR-026"]),
   S("DCT-EP10","BCBS 239 evidence pack","Lineage-completeness scoring; DQ evidence bundles; ownership coverage.",["Coverage metric per domain","Evidence bundle exports"],5,"C",["compliance","P9"],"Governance & Security",["CR-010","CR-011","CR-013"]),
   S("DCT-EP10","Retention & legal hold","Configurable retention; WORM/legal-hold immutability; e-discovery export.",["Retention applied; held records immutable","Signed e-discovery export"],5,"C",["compliance","P9"],"Governance & Security",["CR-030","CR-031"]),
+
+  // EP11 — Federated operating model & enterprise sign-off
+  S("DCT-EP11","Domain ownership model (domain.yaml / CODEOWNERS / groups)","Make domains first-class; map Git paths + IdP groups to domain steward roles; every model has an owning domain.",["A model resolves its domain + steward group","Reviewers auto-route to the owning domain","Ownerless models reported"],5,"M",["federation","P3"],"Governance & Security",["FR-FG-001","FR-FG-002","FR-FG-003"]),
+  S("DCT-EP11","Chief Data Architect & ARB roles","Add chief_data_architect (enterprise sign-off + standards admin) and architecture_review_board (delegated quorum) roles.",["CDA can sign off any domain's enterprise change","ARB quorum can sign off when delegated","Domain stewards remain domain-scoped"],5,"M",["federation","P3","auth"],"Governance & Security",["FR-FG-010","FR-FG-011","FR-FG-012"]),
+  S("DCT-EP11","Model scope & conformed-model protection","Add scope (domain/shared/enterprise) to the model envelope; shared/enterprise models are CDA-governed.",["Scope persists and drives routing","Only CDA/ARB can evolve shared/enterprise models"],5,"M",["federation","P4"],"Governance & Security",["FR-FG-004","FR-FG-032"]),
+  S("DCT-EP11","Scope-aware approval routing engine","Configurable policy computing required approvers from kind/severity/scope/classification/cross-domain; CDA sign-off for BDM/major/cross-domain/new-entity/classification/shared.",["Each trigger condition requires CDA sign-off","Routine in-domain change is domain-tier only","Policy changes without code changes","SoD enforced at every tier"],8,"M",["federation","P4"],"Governance & Security",["FR-FG-020","FR-FG-021","FR-FG-022","FR-FG-013"]),
+  S("DCT-EP11","Enterprise sign-off tier & CDA review queue","Escalate qualifying ChangeSets to the CDA after domain approval; dashboard of pending enterprise sign-offs with scope/impact/gates; SLA + escalation.",["Qualifying change cannot merge without CDA sign-off","CDA sees all pending enterprise approvals","Stale sign-offs escalate per policy"],8,"M",["federation","P4","ui"],"Governance & Security",["FR-FG-023","FR-FG-024","FR-FG-025"]),
+  S("DCT-EP11","Standards-as-code & duplication detection","Enterprise modeling standards as automated gates (naming, classification, semver, cross-domain integrity); flag entities overlapping conformed models.",["Non-compliant change fails the relevant gate","A near-duplicate entity raises a reuse warning"],5,"S",["federation","P4"],"Governance & Security",["FR-FG-030","FR-FG-031"]),
+  S("DCT-EP11","Two-tier federated audit & evidence","Record domain proposer, domain approver(s), and CDA sign-off; per-change evidence bundle of the federated chain.",["Audit shows both tiers for a governed change","Evidence bundle exports the full approval chain"],3,"M",["federation","P4","security"],"Governance & Security",["FR-FG-040","FR-FG-041"]),
+  S("DCT-EP11","Graduated autonomy / delegation","Let the CDA delegate change classes to the domain tier over time; recorded and audited.",["A delegated class no longer requires CDA sign-off","Delegation is audited"],3,"C",["federation","P9"],"Governance & Security",["FR-FG-026"]),
+  S("DCT-EP11","Federation registry & domains UI","Catalog of domains, owners, conformed/shared models, and pending sign-offs.",["Registry lists domains, owners, shared models","Pending enterprise sign-offs visible"],3,"S",["federation","P6","ui"],"Experience",["FR-FG-005"]),
 ];
 
 const PRI = { M: "High", S: "Medium", C: "Low", W: "Lowest" };

@@ -12,6 +12,7 @@ const FILES = [
   "03-non-functional-requirements.md",
   "04-data-and-classification.md",
   "05-compliance-and-security.md",
+  "07-federated-operating-model.md",
   "06-traceability-matrix.md",
 ];
 

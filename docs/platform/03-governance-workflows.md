@@ -173,3 +173,47 @@ classification mask**. Every allow/deny on sensitive data is auditable.
    re-registers `trade@3.0.0`; artifacts regenerate; UC sync pushes the new schema;
    subscribers are notified; the pipeline is queued for deploy to `staging`.
 7. Every step is in the audit chain, traceable to the merge SHA.
+
+## 10. Federated operating model (domains + Chief Data Architect)
+
+DCT implements **federated computational governance**: domains own and propose
+their BDM/PDM changes; the **Chief Data Architect (CDA)** holds enterprise sign-off.
+This is the same engine above (maker/checker + quorum + escalation + audit),
+extended with **scope-aware routing** and a **CDA tier**. Full proposal:
+[`../operating-model/FEDERATED-OPERATING-MODEL.md`](../operating-model/FEDERATED-OPERATING-MODEL.md).
+
+### 10.1 Two-tier approval
+- **Tier 1 — domain (autonomous within guardrails):** the domain modeler proposes
+  (maker); automated standards-as-code gates run; a domain steward (≠ author)
+  approves. Routine, in-domain change completes here.
+- **Tier 2 — enterprise (CDA / ARB sign-off):** when the routing policy requires it,
+  the ChangeSet escalates to the **CDA review queue**; the CDA (or a delegated ARB
+  quorum) signs off before merge.
+
+### 10.2 Scope-aware routing policy
+The required approvers are computed from the change's attributes. **CDA sign-off is
+required by default** when a change: touches a **BDM**, is **breaking/major**, adds a
+**cross-domain** reference, introduces a **new entity**, alters **classification**, or
+affects a **`shared`/`enterprise`-scope** (conformed) model. Routine in-domain change
+(PDM tuning, docs, minor additive) is **domain-tier only**. The matrix is
+configuration, so the CDA can **graduate autonomy** to domains over time.
+
+### 10.3 Model scope & ownership
+- Every model has an **owning domain** (`domain.yaml` + `CODEOWNERS` + IdP groups
+  drive reviewer routing) and a **scope** (`domain` / `shared` / `enterprise`).
+- **`shared`/`enterprise`** (conformed) models are CDA-governed; only the CDA (or
+  delegated ARB) may evolve them — protecting conformed dimensions and cross-domain
+  reference entities.
+
+### 10.4 Roles added
+`chief_data_architect` (enterprise sign-off + standards admin) and
+`architecture_review_board` (delegated quorum sign-off). Domain `steward`/
+`domain_owner` roles are domain-scoped. SoD holds at every tier — the proposer can
+never provide domain approval or CDA sign-off for their own change.
+
+### 10.5 Accountability
+The immutable audit records the **domain proposer, domain approver(s), and CDA
+sign-off** for every governed BDM/PDM change; a per-change evidence bundle evidences
+the full federated approval chain.
+
+> Requirements: [`FR-FG-*`](../requirements/07-federated-operating-model.md). Delivery: epic **DCT-EP11**.

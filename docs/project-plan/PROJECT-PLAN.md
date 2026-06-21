@@ -13,7 +13,10 @@ dependencies, and acceptance gates are the durable part.
 3. Attribute-level access (tier + PII + MNPI), column-level lineage, and two-way
    Unity Catalog sync.
 4. Maker/checker + segregation of duties + immutable audit (the v1 compliance bar).
-5. Minimal-intervention install; one pilot domain live end to end.
+5. A **federated operating model** — domains own and propose BDM/PDM changes; the
+   **Chief Data Architect** signs off on enterprise-significant change (a top
+   priority; see §3a and [operating model](../operating-model/FEDERATED-OPERATING-MODEL.md)).
+6. Minimal-intervention install; one pilot domain live end to end.
 
 **Definition of success:** the pilot domain's models drive a deployed Databricks
 pipeline; a breaking change is proposed, gated, approved (maker/checker), merged,
@@ -51,18 +54,25 @@ Each phase ends **runnable** and independently demonstrable.
 - **Deliverables:** consumers discover & read products; SDK/CLI round-trip.
 - **Milestone M2:** "Discover and consume a data product via UI + SDK."
 
-### Phase P3 — Identity & access *(1–2 sprints)* · WS-B
+### Phase P3 — Identity, access & federation roles *(1–2 sprints)* · WS-B
 - OIDC/SAML + sessions; API keys/service principals; RBAC capabilities; ABAC
   clearance (tier + PII + MNPI); group→role mapping; Postgres RLS; admin config.
-- **Deliverables:** SSO login; masked reads by role; RLS enforced.
-- **Milestone M3:** "Attribute-level access enforced across read surfaces."
+- **Federation:** domains as first-class (`domain.yaml`/`CODEOWNERS`/group mapping);
+  domain-scoped steward/owner roles; **Chief Data Architect (CDA)** and ARB roles;
+  model `scope` (domain/shared/enterprise).
+- **Deliverables:** SSO login; masked reads by role; RLS enforced; domains + CDA role configured.
+- **Milestone M3:** "Attribute-level access enforced; domains & CDA role in place."
 
-### Phase P4 — Governance & workflow *(2–3 sprints)* · WS-B *(core differentiator)*
+### Phase P4 — Governance, workflow & federated sign-off *(2–3 sprints)* · WS-B *(core differentiator)*
 - ChangeSets; gates (engine checks + semver); maker/checker + SoD + quorum +
   PII/MNPI escalation; merge→reconcile→re-register; immutable hash-chained audit;
   ChangeSet review UI; models-repo CI + branch protection.
-- **Deliverables:** the end-to-end governed-change scenario passes.
-- **Milestone M4:** "Breaking change gated, approved (maker/checker), merged, audited."
+- **Federated operating model (priority):** scope-aware **routing-policy engine**;
+  **CDA / ARB enterprise sign-off** tier; **CDA review queue/dashboard**; conformed-
+  model protection; standards-as-code gates; SLA + escalation; two-tier audit.
+- **Deliverables:** the end-to-end governed-change scenario passes **including domain
+  approval → CDA sign-off** for a BDM change.
+- **Milestone M4:** "BDM change: domain-proposed, domain-approved, CDA-signed-off, merged, audited."
 
 ### Phase P5 — Orchestration *(2 sprints)* · WS-C
 - Orchestration adapter (local + Databricks Workflows/DLT via Asset Bundles);
@@ -92,6 +102,24 @@ Each phase ends **runnable** and independently demonstrable.
 - GDPR (purpose/lawful-basis tags, RTBF lineage propagation, residency), BCBS 239
   evidence/coverage, retention + legal hold; additional engines/catalog federation;
   multi-domain rollout.
+
+## 3a. Federated operating model (priority workstream)
+
+A top-priority, cross-cutting concern delivered mainly in **P3 (roles/domains)** and
+**P4 (routing + CDA sign-off)**, tracked under epic **DCT-EP11**. Full proposal:
+[`../operating-model/FEDERATED-OPERATING-MODEL.md`](../operating-model/FEDERATED-OPERATING-MODEL.md).
+
+- **Operating model:** domains own and propose BDM/PDM change (tier-1 maker/checker);
+  the **Chief Data Architect** signs off on enterprise-significant change (tier-2),
+  with optional ARB delegation and graduated autonomy.
+- **Technical infrastructure:** domains as first-class; CDA/ARB roles; model `scope`
+  (domain/shared/enterprise); a configurable **routing-policy engine**; a **CDA
+  review queue**; standards-as-code gates; conformed-model protection; two-tier
+  immutable audit.
+- **Non-technical readiness (parallel track):** appoint the CDA; charter the ARB;
+  define initial domains + owners; agree the routing matrix and enterprise standards.
+- **Acceptance:** a BDM change is proposed by a domain, approved by the domain
+  steward, escalated, and **signed off by the CDA** before merge — evidenced in audit.
 
 ## 4. Indicative schedule
 
@@ -164,6 +192,8 @@ Postgres; secrets manager; egress allow-listing / private networking.
 | Corporate variance (IdP/Git/secrets) | M | M | Adapter interfaces; per-provider conformance tests |
 | Environment access delays (workspace/IdP) | H | M | Local/in-memory paths keep delivery moving; wire live in P3/P5 |
 | Adoption | M | H | Pilot domain, strong catalog UX, SDK/CLI, minimal-intervention install |
+| Federation decision-rights unclear / CDA bottleneck | M | H | Encode routing as policy; standards-as-code reduce CDA load to judgment calls; graduated autonomy; ARB delegation; SLAs + escalation |
+| Domain ownership gaps (ownerless models) | M | M | Ownership-as-data (`domain.yaml`/CODEOWNERS); ownerless-model report blocks publication |
 | Key-person dependency | M | M | Pairing, ADRs, docs-as-you-go |
 
 ## 9. Governance of the project
