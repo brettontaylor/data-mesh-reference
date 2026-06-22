@@ -74,7 +74,8 @@ The DCT web app defines an "Interactive ERD" in its requirements (FR-UI-003, `do
 | Toggle PDM bindings / layers | ❌ | ✅ **new** — toggle BDM-only ↔ show PDM physical tables + BDM→PDM links |
 | Cardinality (1:N) glyphs | ❌ | ✅ **new** — infer from PK vs FK side |
 | Deep-link to entity (`?focus=`) | partial | ✅ **new** — URL state |
-| Export PNG/SVG | ❌ | ✅ **new** — `toPng` (html-to-image) |
+| Export PNG/SVG | ❌ | ⛔ not needed — the deliverable is the live embedded navigator |
+| "Shape" ego-glyph browser | ✅ | ⛔ intentionally NOT ported — not wanted |
 | Access-aware masking by role | ❌ (WG) / ✅ (SQ) | ✅ **optional tier-2** — reuse `/access` engine |
 | Dark mode | ❌ | ⚠️ optional (tokens exist; low priority) |
 
@@ -203,7 +204,7 @@ So when your second-wave domain remap merges, the ERD reflects it on next load �
 
 - **P1 — Core ERD (MVP):** mapper + dagre layout + EntityNode (expand, PK/FK + classification badges) + edges + zoom/pan/minimap/fullscreen + focus picker. Renders live BDMs. *Deliverable: `/model` works.*
 - **P2 — Navigation depth:** explore/ego mode, highlight neighbors, click-FK-to-traverse, deep-link `?focus=`, cardinality glyphs.
-- **P3 — Layers & export:** BDM↔PDM↔semantic layer toggles (show physical bindings + BDM→PDM links), PNG/SVG export, legend.
+- **P3 — Layers (optional polish):** BDM↔PDM↔semantic layer toggles (show physical bindings + BDM→PDM links). (PNG/SVG export and the "shape" glyph browser are out of scope — not needed.)
 - **P4 — Access-aware (optional):** role selector + live attribute masking reusing the `/access` decision engine.
 
 P1 is the bulk of the value and is self-contained.
@@ -251,8 +252,10 @@ runtime errors**.
    supported`). Replaced with a ~40-line dependency-free **layered layout**
    (`src/layout.ts`) — which is exactly the semantic-geography concept (rank = FK
    depth, domain-clustered, optional pin map). Lighter and pure-ESM.
-2. **No `html-to-image` in P1.** Also CJS; PNG export deferred to P3 (will use a
-   client-only image path). Removing it kept the bundle pure ESM.
+2. **No `html-to-image` / PNG export — dropped, not needed.** The deliverable is the
+   live embedded navigator; static image export isn't part of it. (It was also CJS and
+   reintroduced the require shim, so dropping it kept the bundle pure ESM.) The
+   WineGraph "shape" ego-glyph browser is likewise intentionally not ported.
 
 **One bundling note for future rebuilds:** zustand's `use-sync-external-store` shim
 does a CJS `require("react")`. Since React is external (shared with the host), the
