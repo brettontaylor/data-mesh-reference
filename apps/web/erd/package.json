@@ -1,0 +1,23 @@
+{
+  "name": "@dct/erd-bundle",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Build-only package for the DCT ERD module. NOT a pnpm workspace member — the host app consumes the pre-built ./dist, so its graph dependencies never touch the host's package.json or the air-gapped install.",
+  "scripts": {
+    "build": "node scripts/inline-css.mjs && tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/__tests__/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@xyflow/react": "^12",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tsup": "^8",
+    "tsx": "^4",
+    "typescript": "^5.7.2"
+  }
+}

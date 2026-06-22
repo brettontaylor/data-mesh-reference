@@ -36,6 +36,9 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "erd/src",
+    "erd/node_modules",
+    "erd/tsup.config.ts"
   ]
 }

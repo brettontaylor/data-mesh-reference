@@ -1,0 +1,5 @@
+node_modules/
+.tsup/
+*.tsbuildinfo
+src/generated/
+# NOTE: dist/ is intentionally committed — it is the pre-bundled artifact the host imports.
