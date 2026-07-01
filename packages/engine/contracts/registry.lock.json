@@ -235,6 +235,14 @@
             "pk": true,
             "fk": null
           },
+          "source_trade_ref": {
+            "type": "string",
+            "classification": "internal",
+            "pii": false,
+            "mnpi": false,
+            "pk": false,
+            "fk": null
+          },
           "trade_date": {
             "type": "date",
             "classification": "internal",
@@ -309,7 +317,7 @@
           }
         }
       },
-      "signature": "dcd88191966672c1"
+      "signature": "d7c7dd227dac9b43"
     },
     "counterparty_physical": {
       "version": "1.0.0",
@@ -421,6 +429,145 @@
         ]
       },
       "signature": "7ab92ff1b88e3654"
+    },
+    "trade_src_to_bdm": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "mapping",
+        "from": "source:trades_feed",
+        "to": "bdm:trade",
+        "rules": [
+          "counterparty_id<=lei:LOOKUP",
+          "currency_code<=ccy:IDENTITY",
+          "instrument_id<=isin:LOOKUP",
+          "notional<=quantity+price:quantity * price",
+          "source_trade_ref<=src_ref:IDENTITY",
+          "trade_id<=src_trade_id:IDENTITY"
+        ]
+      },
+      "signature": "4900735f8f14d551"
+    },
+    "trade_dq": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "dq",
+        "target": "bdm:trade",
+        "rules": [
+          "currency_code:referential:currency.currency_code:{}:error",
+          "instrument_id:referential:instrument.instrument_id:{}:error",
+          "notional:range::{\"min\":0}:warn",
+          "side:accepted_values::{\"values\":[\"BUY\",\"SELL\"]}:error",
+          "trade:freshness::{\"maxAgeHours\":24}:warn",
+          "trade_id:not_null::{}:error",
+          "trade_id:unique::{}:error"
+        ]
+      },
+      "signature": "e440f8ec657b4cd1"
+    },
+    "reg_trade_extract": {
+      "version": "2.1.0",
+      "surface": {
+        "kind": "extract",
+        "consumer": "Regulatory Reporting",
+        "from": [
+          "bdm:counterparty",
+          "bdm:instrument",
+          "bdm:trade"
+        ],
+        "columns": [
+          "CounterpartyLEI<=counterparty.lei",
+          "CurrencyCode<=trade.currency_code",
+          "ISIN<=instrument.isin",
+          "Notional<=trade.notional",
+          "TradeDate<=trade.trade_date",
+          "TradeId<=trade.trade_id"
+        ],
+        "grain": "one row per trade"
+      },
+      "signature": "25704311c061fa93"
+    },
+    "dim_instrument": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "transformation",
+        "target": "pdm:instrument_physical",
+        "sources": [
+          "A:instrument:",
+          "B:currency:LEFT OUTER on A.currency_code = B.currency_code"
+        ],
+        "uses": [
+          "currency_iso"
+        ],
+        "keyResolution": [],
+        "assembly": "{}",
+        "fields": [
+          "AssetClass<=instrument.asset_class:DIRECT::",
+          "CUSIP<=instrument.cusip:DIRECT::",
+          "CurrencyDimID<=instrument.currency_code:REFMAP_LOOKUP:currency_iso:currency",
+          "ISIN<=instrument.isin:DIRECT::",
+          "InstrumentDimID<=:AUTO_SURROGATE::",
+          "dtEnd<=:SCD2_END::",
+          "dtStart<=:SCD2_START::"
+        ]
+      },
+      "signature": "50feccc6d73aa921"
+    },
+    "dim_position": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "transformation",
+        "target": "pdm:position_physical",
+        "sources": [
+          "A:position:",
+          "B:instrument:LEFT OUTER on A.instrument_id = B.instrument_id",
+          "C:currency:LEFT OUTER on A.currency_code = C.currency_code"
+        ],
+        "uses": [
+          "currency_iso",
+          "instrument_key"
+        ],
+        "keyResolution": [
+          "asset_class = BOND=>instrument.InstrumentDimID",
+          "asset_class = EQUITY=>instrument.InstrumentDimID"
+        ],
+        "assembly": "{\"union\":[{\"branch\":\"position\",\"filter\":\"No Filter\",\"columns\":{\"status\":\"ACTIVE\"}},{\"branch\":\"position_closed\",\"filter\":\"as_of_date < current_date\",\"columns\":{\"status\":\"Default to CLOSED\"}}],\"subqueries\":[{\"alias\":\"latest_fx\",\"sql\":\"SELECT ccy, MAX(as_of_date) AS fx_date, rate FROM fx_rates GROUP BY ccy, rate\\n\"}]}",
+        "fields": [
+          "AsOfDate<=position.as_of_date:DIRECT::",
+          "BookId<=position.book_id:DIRECT::",
+          "CurrencyDimID<=position.currency_code:REFMAP_LOOKUP:currency_iso:currency",
+          "DataSourceName<=:LITERAL::",
+          "InstrumentDimID<=position.instrument_id:KEY_RESOLUTION:instrument_key:instrument",
+          "MarketValue<=position.market_value:quantity * latest_fx.rate::",
+          "PositionDimID<=:AUTO_SURROGATE::",
+          "Quantity<=position.quantity:DIRECT::",
+          "dtEnd<=:SCD2_END::",
+          "dtStart<=:SCD2_START::"
+        ]
+      },
+      "signature": "aa9ee3d2e2e69830"
+    },
+    "currency_iso": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "refmap",
+        "keyType": "ISO 4217 currency code → CurrencyDimID",
+        "entries": [
+          "EUR=>2",
+          "GBP=>4",
+          "JPY=>3",
+          "USD=>1"
+        ]
+      },
+      "signature": "10fcea508280ff1e"
+    },
+    "instrument_key": {
+      "version": "1.0.0",
+      "surface": {
+        "kind": "refmap",
+        "keyType": "Instrument natural key (ISIN) → InstrumentDimID",
+        "entries": []
+      },
+      "signature": "6cd1b5a780217405"
     }
   }
 }

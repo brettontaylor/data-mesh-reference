@@ -14,7 +14,12 @@ fields:
     type: string
     classification: internal
     pk: true
-    description: Unique trade identifier.
+    description: Unique trade identifier (surrogate key).
+  - name: source_trade_ref
+    type: string
+    classification: internal
+    bk: true
+    description: Source-system trade reference (natural/business key from the OMS).
   - name: trade_date
     type: date
     classification: internal

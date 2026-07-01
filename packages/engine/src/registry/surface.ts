@@ -2,7 +2,7 @@
 // versions against. Cosmetic fields (description/owner/upstream) are excluded:
 // they don't require a breaking bump.
 import { createHash } from "node:crypto";
-import type { Entity, Pdm, SemanticModel } from "../framework/types";
+import type { Entity, Extract, DqRuleSet, Mapping, Pdm, RefMap, SemanticModel, Transformation } from "../framework/types";
 import type { Level } from "../framework/version";
 
 export type Surface = Record<string, unknown>;
@@ -44,6 +44,56 @@ export function semanticSurface(s: SemanticModel): Surface {
   };
 }
 
+export function mappingSurface(m: Mapping): Surface {
+  return {
+    kind: "mapping",
+    from: `${m.from.kind}:${m.from.id}`,
+    to: `${m.to.kind}:${m.to.id}`,
+    rules: m.rules.map((r) => `${r.target}<=${(r.sources ?? []).join("+")}:${r.logic ?? ""}`).sort(),
+  };
+}
+
+export function dqSurface(d: DqRuleSet): Surface {
+  return {
+    kind: "dq",
+    target: `${d.target.kind}:${d.target.id}`,
+    rules: d.rules
+      .map((r) => `${r.entity ?? r.field}:${r.type}:${r.ref ?? ""}:${JSON.stringify(r.params ?? {})}:${r.severity}`)
+      .sort(),
+  };
+}
+
+export function extractSurface(e: Extract): Surface {
+  return {
+    kind: "extract",
+    consumer: e.consumer,
+    from: e.from.map((f) => `${f.kind}:${f.id}`).sort(),
+    columns: e.columns.map((c) => `${c.name}<=${c.from}`).sort(),
+    grain: e.grain ?? null,
+  };
+}
+
+export function transformationSurface(t: Transformation): Surface {
+  return {
+    kind: "transformation",
+    target: `${t.target.kind}:${t.target.id}`,
+    sources: t.sources.map((s) => `${s.alias}:${s.entity}:${s.join ?? ""}`).sort(),
+    uses: [...(t.uses ?? [])].sort(),
+    keyResolution: (t.keyResolution ?? []).map((k) => `${k.when}=>${k.dim}.${k.dimId}`).sort(),
+    // bespoke SQL is versioned via a coarse hash so any change bumps the surface
+    assembly: JSON.stringify(t.assembly ?? {}),
+    fields: t.fields.map((f) => `${f.target}<=${f.from ?? ""}:${f.logic ?? ""}:${f.refmap ?? ""}:${f.lookupDim ?? ""}`).sort(),
+  };
+}
+
+export function refmapSurface(r: RefMap): Surface {
+  return {
+    kind: "refmap",
+    keyType: r.keyType ?? null,
+    entries: (r.entries ?? []).map((e) => `${e.from}=>${e.to}`).sort(),
+  };
+}
+
 function stable(o: unknown): string {
   if (o === null || typeof o !== "object") return JSON.stringify(o);
   if (Array.isArray(o)) return `[${o.map(stable).join(",")}]`;
@@ -81,6 +131,36 @@ export function severity(prev: Surface, next: Surface): Level {
       return "major";
     if (a?.loadStrategy !== b?.loadStrategy) return "minor";
     return "none";
+  }
+  // mapping / dq — rule list diff (removing/altering a rule breaks; adding is additive)
+  if (next.kind === "mapping" || next.kind === "dq") {
+    const p = (prev.rules as string[]) ?? [], n = (next.rules as string[]) ?? [];
+    if (p.some((x) => !n.includes(x))) return "major";
+    if (n.some((x) => !p.includes(x))) return "minor";
+    return "none";
+  }
+  // extract — dropping a column breaks the consumer; adding is additive
+  if (next.kind === "extract") {
+    const p = (prev.columns as string[]) ?? [], n = (next.columns as string[]) ?? [];
+    if (p.some((x) => !n.includes(x))) return "major";
+    if (n.some((x) => !p.includes(x))) return "minor";
+    return "none";
+  }
+  // transformation — field-mapping removed/changed is breaking; added is additive;
+  // otherwise any change to sources/assembly/keys/refmaps is a minor revision
+  if (next.kind === "transformation") {
+    const p = (prev.fields as string[]) ?? [], n = (next.fields as string[]) ?? [];
+    if (p.some((x) => !n.includes(x))) return "major";
+    if (n.some((x) => !p.includes(x))) return "minor";
+    const shape = (s: Surface) => stable([s.target, s.sources, s.uses, s.keyResolution, s.assembly]);
+    return shape(prev) === shape(next) ? "none" : "minor";
+  }
+  // refmap — changing/removing an entry can break downstream; adding is additive
+  if (next.kind === "refmap") {
+    const p = (prev.entries as string[]) ?? [], n = (next.entries as string[]) ?? [];
+    if (p.some((x) => !n.includes(x))) return "major";
+    if (n.some((x) => !p.includes(x))) return "minor";
+    return prev.keyType === next.keyType ? "none" : "minor";
   }
   // semantic
   const removed = (k: "dimensions" | "measures" | "sources") =>

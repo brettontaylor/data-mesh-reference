@@ -18,10 +18,12 @@ fields:
   - name: isin
     type: string
     classification: public
+    bk: true
     description: ISIN — public market identifier.
   - name: cusip
     type: string
     classification: public
+    bk: true
     description: CUSIP — public market identifier (North America).
   - name: name
     type: string

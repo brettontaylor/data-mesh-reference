@@ -1,7 +1,8 @@
 // @dct/sdk — typed client for the DEAL Control Tower read/publication API.
 // Self-contained (no workspace types) so external consumers can use it directly.
 
-export type ModelKind = "bdm" | "pdm" | "semantic" | "source";
+export type ModelKind =
+  | "bdm" | "pdm" | "semantic" | "source" | "mapping" | "dq" | "extract" | "transformation" | "refmap";
 
 export interface SdkField {
   name: string;
@@ -10,6 +11,7 @@ export interface SdkField {
   pii: boolean;
   mnpi: boolean;
   isPk: boolean;
+  bk?: boolean; // natural / business key
   fkRef: string | null;
 }
 

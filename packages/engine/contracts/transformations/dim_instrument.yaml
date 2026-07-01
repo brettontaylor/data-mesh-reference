@@ -1,0 +1,19 @@
+transformation: dim_instrument
+layer: silver_to_gold
+complexity: medium
+target: { kind: pdm, id: instrument_physical }
+version: 1.0.0
+owner: reference-data-eng
+sources:
+  - { alias: A, entity: instrument }
+  - { alias: B, entity: currency, join: "LEFT OUTER on A.currency_code = B.currency_code" }
+uses: [currency_iso]
+fields:
+  - { target: InstrumentDimID, logic: AUTO_SURROGATE, description: Surrogate key }
+  - { target: dtStart, logic: SCD2_START }
+  - { target: dtEnd, logic: SCD2_END }
+  - { target: ISIN, from: "instrument.isin", logic: DIRECT, bronze: "instruments_raw.isin" }
+  - { target: CUSIP, from: "instrument.cusip", logic: DIRECT, bronze: "instruments_raw.cusip" }
+  - { target: AssetClass, from: "instrument.asset_class", logic: DIRECT, bronze: "instruments_raw.asset_class" }
+  - { target: CurrencyDimID, from: "instrument.currency_code", logic: REFMAP_LOOKUP,
+      refmap: currency_iso, lookupDim: currency, join: "sCurrencyCodeISO", bronze: "instruments_raw.ccy" }

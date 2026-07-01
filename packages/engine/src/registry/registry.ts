@@ -8,6 +8,11 @@ import {
   bdmSurface,
   pdmSurface,
   semanticSurface,
+  mappingSurface,
+  dqSurface,
+  extractSurface,
+  transformationSurface,
+  refmapSurface,
   hashSurface,
   severity,
   type Surface,
@@ -53,6 +58,55 @@ export function buildModels(c: Contract): Model[] {
       status: s.status ?? "active",
       dependsOn: s.sources.map((x) => `bdm:${x}`),
       surface: semanticSurface(s),
+    });
+  for (const m of c.mappings ?? [])
+    models.push({
+      id: m.mapping,
+      kind: "mapping",
+      version: m.version,
+      status: m.status ?? "active",
+      dependsOn: [`${m.from.kind}:${m.from.id}`, `${m.to.kind}:${m.to.id}`],
+      surface: mappingSurface(m),
+    });
+  for (const d of c.dqRuleSets ?? [])
+    models.push({
+      id: d.dqRuleSet,
+      kind: "dq",
+      version: d.version,
+      status: d.status ?? "active",
+      dependsOn: [`${d.target.kind}:${d.target.id}`],
+      surface: dqSurface(d),
+    });
+  for (const e of c.extracts ?? [])
+    models.push({
+      id: e.extract,
+      kind: "extract",
+      version: e.version,
+      status: e.status ?? "active",
+      dependsOn: e.from.map((f) => `${f.kind}:${f.id}`),
+      surface: extractSurface(e),
+    });
+  for (const t of c.transformations ?? [])
+    models.push({
+      id: t.transformation,
+      kind: "transformation",
+      version: t.version,
+      status: t.status ?? "active",
+      dependsOn: [
+        `${t.target.kind}:${t.target.id}`,
+        ...t.sources.map((s) => `bdm:${s.entity}`),
+        ...(t.uses ?? []).map((u) => `refmap:${u}`),
+      ],
+      surface: transformationSurface(t),
+    });
+  for (const r of c.refMaps ?? [])
+    models.push({
+      id: r.refmap,
+      kind: "refmap",
+      version: r.version,
+      status: r.status ?? "active",
+      dependsOn: [],
+      surface: refmapSurface(r),
     });
   return models;
 }

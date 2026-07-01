@@ -1,0 +1,6 @@
+refmap: instrument_key
+version: 1.0.0
+owner: reference-data
+keyType: Instrument natural key (ISIN) → InstrumentDimID
+source: instrument (Dim)
+description: Resolves an instrument's public identifier to its surrogate dimension key.

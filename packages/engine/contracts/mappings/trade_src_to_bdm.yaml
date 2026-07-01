@@ -1,0 +1,12 @@
+mapping: trade_src_to_bdm
+from: { kind: source, id: trades_feed }
+to: { kind: bdm, id: trade }
+version: 1.0.0
+owner: trading-data-eng
+rules:
+  - { target: trade_id, sources: [src_trade_id], logic: IDENTITY }
+  - { target: source_trade_ref, sources: [src_ref], logic: IDENTITY }
+  - { target: instrument_id, sources: [isin], logic: LOOKUP, description: Resolve ISIN to instrument surrogate key }
+  - { target: counterparty_id, sources: [lei], logic: LOOKUP, description: Resolve LEI to counterparty surrogate key }
+  - { target: notional, sources: [quantity, price], logic: "quantity * price" }
+  - { target: currency_code, sources: [ccy], logic: IDENTITY }

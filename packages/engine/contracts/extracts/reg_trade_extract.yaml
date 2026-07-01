@@ -1,0 +1,18 @@
+extract: reg_trade_extract
+consumer: Regulatory Reporting
+version: 2.1.0
+owner: reg-reporting
+from:
+  - { kind: bdm, id: trade }
+  - { kind: bdm, id: instrument }
+  - { kind: bdm, id: counterparty }
+grain: one row per trade
+columns:
+  - { name: TradeId, from: trade.trade_id }
+  - { name: TradeDate, from: trade.trade_date }
+  - { name: ISIN, from: instrument.isin, classification: public }
+  - { name: CounterpartyLEI, from: counterparty.lei, classification: public }
+  - { name: Notional, from: trade.notional, classification: confidential }
+  - { name: CurrencyCode, from: trade.currency_code, classification: public }
+filters: "trade_date >= current_date - 30"
+delivery: { format: parquet, cadence: daily, destination: reg-reporting-bucket }

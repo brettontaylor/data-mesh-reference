@@ -1,5 +1,6 @@
 // Projection record types — the read-model materialized from the Git models repo.
-export type ModelKind = "bdm" | "pdm" | "semantic" | "source";
+export type ModelKind =
+  | "bdm" | "pdm" | "semantic" | "source" | "mapping" | "dq" | "extract" | "transformation" | "refmap";
 
 export interface DomainRecord {
   id: string;
@@ -14,6 +15,7 @@ export interface FieldRecord {
   pii: boolean;
   mnpi: boolean;
   isPk: boolean;
+  bk?: boolean; // natural / business key
   fkRef: string | null;
 }
 

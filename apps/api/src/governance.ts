@@ -23,7 +23,8 @@ import type { Config, Logger } from "@dct/shared";
 import { can, inDomain, type Principal } from "@dct/auth";
 import { reconcile } from "./reconcile";
 
-export type ModelEditKind = "bdm" | "pdm" | "semantic";
+export type ModelEditKind =
+  | "bdm" | "pdm" | "semantic" | "mapping" | "dq" | "extract" | "transformation" | "refmap";
 export interface ModelEdit {
   kind: ModelEditKind;
   id: string;
@@ -71,9 +72,13 @@ const TIER_RANK: Record<string, number> = {
   public: 0, internal: 1, confidential: 2, restricted: 3,
 };
 
-const DIRS: Record<ModelEditKind, string> = { bdm: "bdm", pdm: "pdm", semantic: "semantic" };
+const DIRS: Record<ModelEditKind, string> = {
+  bdm: "bdm", pdm: "pdm", semantic: "semantic", mapping: "mappings", dq: "dq", extract: "extracts",
+  transformation: "transformations", refmap: "refmaps",
+};
 const idField: Record<ModelEditKind, string> = {
-  bdm: "entity", pdm: "pdm", semantic: "semanticModel",
+  bdm: "entity", pdm: "pdm", semantic: "semanticModel", mapping: "mapping", dq: "dqRuleSet", extract: "extract",
+  transformation: "transformation", refmap: "refmap",
 };
 
 export class GovernanceService {
@@ -110,7 +115,14 @@ export class GovernanceService {
     const next: Contract = JSON.parse(JSON.stringify(contract));
     for (const e of edits) {
       const arr =
-        e.kind === "bdm" ? next.entities : e.kind === "pdm" ? next.pdms : next.semanticModels;
+        e.kind === "bdm" ? next.entities
+        : e.kind === "pdm" ? next.pdms
+        : e.kind === "semantic" ? next.semanticModels
+        : e.kind === "mapping" ? next.mappings
+        : e.kind === "dq" ? next.dqRuleSets
+        : e.kind === "extract" ? next.extracts
+        : e.kind === "transformation" ? next.transformations
+        : next.refMaps;
       const list = arr as unknown as Record<string, unknown>[];
       const key = idField[e.kind];
       const idx = list.findIndex((m) => m[key] === e.id);
@@ -192,6 +204,11 @@ export class GovernanceService {
       ...current.entities.map((e) => e.entity),
       ...current.pdms.map((p) => p.pdm),
       ...current.semanticModels.map((s) => s.semanticModel),
+      ...(current.mappings ?? []).map((m) => m.mapping),
+      ...(current.dqRuleSets ?? []).map((d) => d.dqRuleSet),
+      ...(current.extracts ?? []).map((x) => x.extract),
+      ...(current.transformations ?? []).map((t) => t.transformation),
+      ...(current.refMaps ?? []).map((r) => r.refmap),
     ]);
     const newEntity = input.edits.some((e) => !currentIds.has(e.id));
     const requiresEnterpriseSignoff = anyBdm || isMajor || newEntity || requiresGovernance;

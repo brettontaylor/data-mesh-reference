@@ -7,11 +7,25 @@ import type {
   AccessModel,
   Contract,
   Entity,
+  Extract,
+  DqRuleSet,
+  Mapping,
   Pdm,
+  RefMap,
   SemanticModel,
   Source,
   Spec,
+  Transformation,
 } from "./types";
+
+// Tolerant listing: a folder for a new asset kind may not exist yet.
+function listYamlSafe(dir: string): string[] {
+  try {
+    return listYaml(dir);
+  } catch {
+    return [];
+  }
+}
 
 // Repo root = two levels up from src/framework.
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -38,8 +52,13 @@ export function loadContract(): Contract {
   const sources = listYaml(join(CONTRACTS, "sources")).map((p) =>
     readYaml<Source>(p),
   );
+  const mappings = listYamlSafe(join(CONTRACTS, "mappings")).map((p) => readYaml<Mapping>(p));
+  const dqRuleSets = listYamlSafe(join(CONTRACTS, "dq")).map((p) => readYaml<DqRuleSet>(p));
+  const extracts = listYamlSafe(join(CONTRACTS, "extracts")).map((p) => readYaml<Extract>(p));
+  const transformations = listYamlSafe(join(CONTRACTS, "transformations")).map((p) => readYaml<Transformation>(p));
+  const refMaps = listYamlSafe(join(CONTRACTS, "refmaps")).map((p) => readYaml<RefMap>(p));
   const access = readYaml<AccessModel>(join(CONTRACTS, "access.yaml"));
-  return { spec, entities, pdms, semanticModels, sources, access };
+  return { spec, entities, pdms, semanticModels, sources, mappings, dqRuleSets, extracts, transformations, refMaps, access };
 }
 
 /**
@@ -70,6 +89,11 @@ export function parseContract(
     pdms: byPrefix("pdm/").map((f) => parse(f.content) as Pdm),
     semanticModels: byPrefix("semantic/").map((f) => parse(f.content) as SemanticModel),
     sources: byPrefix("sources/").map((f) => parse(f.content) as Source),
+    mappings: byPrefix("mappings/").map((f) => parse(f.content) as Mapping),
+    dqRuleSets: byPrefix("dq/").map((f) => parse(f.content) as DqRuleSet),
+    extracts: byPrefix("extracts/").map((f) => parse(f.content) as Extract),
+    transformations: byPrefix("transformations/").map((f) => parse(f.content) as Transformation),
+    refMaps: byPrefix("refmaps/").map((f) => parse(f.content) as RefMap),
     access: accessFile
       ? (parse(accessFile.content) as AccessModel)
       : { roles: [], defaultRole: "" },

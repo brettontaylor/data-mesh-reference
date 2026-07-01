@@ -1,0 +1,12 @@
+dqRuleSet: trade_dq
+target: { kind: bdm, id: trade }
+version: 1.0.0
+owner: data-governance
+rules:
+  - { field: trade_id, type: not_null, severity: error }
+  - { field: trade_id, type: unique, severity: error }
+  - { field: currency_code, type: referential, ref: currency.currency_code, severity: error }
+  - { field: instrument_id, type: referential, ref: instrument.instrument_id, severity: error }
+  - { field: side, type: accepted_values, params: { values: [BUY, SELL] }, severity: error }
+  - { field: notional, type: range, params: { min: 0 }, severity: warn }
+  - { entity: trade, type: freshness, params: { maxAgeHours: 24 }, severity: warn }

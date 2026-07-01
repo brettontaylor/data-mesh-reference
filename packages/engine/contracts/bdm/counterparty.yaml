@@ -18,6 +18,7 @@ fields:
   - name: lei
     type: string
     classification: public
+    bk: true
     description: Legal Entity Identifier — public registry id.
   - name: legal_name
     type: string

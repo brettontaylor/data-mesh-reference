@@ -1,0 +1,10 @@
+refmap: currency_iso
+version: 1.0.0
+owner: reference-data
+keyType: ISO 4217 currency code → CurrencyDimID
+source: currency (Dim)
+entries:
+  - { from: USD, to: "1" }
+  - { from: EUR, to: "2" }
+  - { from: JPY, to: "3" }
+  - { from: GBP, to: "4" }

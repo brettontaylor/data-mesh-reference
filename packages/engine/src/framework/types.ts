@@ -19,6 +19,7 @@ export interface Field {
   pk?: boolean;
   fk?: ForeignKey;
   facet?: boolean; // exposed as a filterable facet / dimension
+  bk?: boolean; // natural / business key (distinct from the surrogate pk)
   // Orthogonal handling tags layered on top of the sensitivity tier.
   pii?: boolean; // personally identifiable information
   mnpi?: boolean; // material non-public information
@@ -31,8 +32,72 @@ export interface Metric {
   description?: string;
 }
 
-export type ModelKind = "bdm" | "pdm" | "semantic";
+export type ModelKind =
+  | "bdm" | "pdm" | "semantic" | "mapping" | "dq" | "extract" | "transformation" | "refmap";
+export type Complexity = "simple" | "medium" | "complex";
 export type ModelStatus = "draft" | "active" | "deprecated";
+
+export interface AssetRef {
+  kind: string; // bdm | pdm | semantic | source | extract …
+  id: string;
+}
+
+/** A field-level source→target transformation between two assets. */
+export interface MappingRule {
+  target: string;
+  sources?: string[];
+  logic?: string; // expression or transform type: IDENTITY, DERIVE, LOOKUP, SCD2_START…
+  description?: string;
+}
+export interface Mapping {
+  mapping: string; // id
+  from: AssetRef;
+  to: AssetRef;
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  rules: MappingRule[];
+}
+
+export type DqRuleType =
+  | "not_null" | "unique" | "referential" | "range" | "regex" | "accepted_values" | "freshness";
+export interface DqRule {
+  field?: string;
+  entity?: string;
+  type: DqRuleType;
+  ref?: string; // for referential (e.g. "currency.currency_code")
+  params?: Record<string, unknown>;
+  severity: "error" | "warn";
+  description?: string;
+}
+export interface DqRuleSet {
+  dqRuleSet: string; // id
+  target: AssetRef;
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  rules: DqRule[];
+}
+
+/** A published downstream extract/view contract for a consumer. */
+export interface ExtractColumn {
+  name: string;
+  from: string; // "asset.field"
+  classification?: Classification;
+  description?: string;
+}
+export interface Extract {
+  extract: string; // id
+  consumer: string;
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  from: AssetRef[];
+  columns: ExtractColumn[];
+  grain?: string;
+  filters?: string;
+  delivery?: { format?: string; cadence?: string; destination?: string };
+}
 
 /** A Business Data Model — the versioned business entity, sourced upstream. */
 export interface Entity {
@@ -88,6 +153,73 @@ export interface SemanticModel {
   measures: SemanticMeasureRef[];
 }
 
+// ---- Silver→Gold transformations (graded) + reusable reference maps ----
+
+export interface TransformationSource {
+  alias: string;
+  entity: string; // silver BDM id
+  join?: string; // bespoke join clause text
+}
+export type TransformFieldLogic =
+  | "DIRECT" | "LITERAL" | "AUTO_SURROGATE" | "SCD2_START" | "SCD2_END"
+  | "DIM_LOOKUP" | "REFMAP_LOOKUP" | "KEY_RESOLUTION" | string; // or a free expression
+export interface TransformationField {
+  target: string; // gold field / DimID
+  from?: string; // "silver_entity.attribute" or expression
+  logic?: TransformFieldLogic;
+  lookupDim?: string; // Dim/PDM id for DimID resolution
+  refmap?: string; // refmap id used
+  join?: string; // join / refmap key logic
+  bronze?: string; // "BRONZE_TABLE.COLUMN" lineage tail
+  complexity?: Complexity;
+  description?: string;
+}
+export interface UnionBranch {
+  branch: string;
+  filter?: string;
+  columns?: Record<string, string>;
+}
+export interface Subquery {
+  alias: string;
+  sql: string;
+}
+export interface KeyResolutionRule {
+  when: string; // e.g. "asset_class = BOND"
+  dim: string;
+  dimId: string;
+  alias?: string;
+}
+export interface Transformation {
+  transformation: string; // id
+  layer: "silver_to_gold";
+  complexity?: Complexity;
+  target: AssetRef; // GOLD (pdm)
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  sources: TransformationSource[];
+  assembly?: { union?: UnionBranch[]; subqueries?: Subquery[] };
+  keyResolution?: KeyResolutionRule[];
+  uses?: string[]; // referenced refmap ids
+  fields: TransformationField[];
+}
+
+export interface RefMapEntry {
+  from: string;
+  to: string;
+  description?: string;
+}
+export interface RefMap {
+  refmap: string; // id
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  description?: string;
+  keyType?: string; // e.g. "ISO currency code → CurrencyDimID"
+  source?: string;
+  entries?: RefMapEntry[]; // optional enumerated entries
+}
+
 /** A registry record for any model class. */
 export interface RegistryEntry {
   id: string;
@@ -139,6 +271,11 @@ export interface Contract {
   pdms: Pdm[];
   semanticModels: SemanticModel[];
   sources: Source[];
+  mappings: Mapping[];
+  dqRuleSets: DqRuleSet[];
+  extracts: Extract[];
+  transformations: Transformation[];
+  refMaps: RefMap[];
   access: AccessModel;
 }
 

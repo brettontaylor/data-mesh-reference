@@ -1,0 +1,36 @@
+transformation: dim_position
+layer: silver_to_gold
+complexity: complex
+target: { kind: pdm, id: position_physical }
+version: 1.0.0
+owner: trading-data-eng
+sources:
+  - { alias: A, entity: position }
+  - { alias: B, entity: instrument, join: "LEFT OUTER on A.instrument_id = B.instrument_id" }
+  - { alias: C, entity: currency, join: "LEFT OUTER on A.currency_code = C.currency_code" }
+assembly:
+  union:
+    - { branch: position, filter: "No Filter", columns: { status: ACTIVE } }
+    - { branch: position_closed, filter: "as_of_date < current_date", columns: { status: "Default to CLOSED" } }
+  subqueries:
+    - alias: latest_fx
+      sql: >
+        SELECT ccy, MAX(as_of_date) AS fx_date, rate
+        FROM fx_rates GROUP BY ccy, rate
+keyResolution:
+  - { when: "asset_class = BOND", dim: instrument, dimId: InstrumentDimID }
+  - { when: "asset_class = EQUITY", dim: instrument, dimId: InstrumentDimID }
+uses: [instrument_key, currency_iso]
+fields:
+  - { target: PositionDimID, logic: AUTO_SURROGATE }
+  - { target: dtStart, logic: SCD2_START }
+  - { target: dtEnd, logic: SCD2_END }
+  - { target: BookId, from: "position.book_id", logic: DIRECT, bronze: "positions_raw.book_id" }
+  - { target: AsOfDate, from: "position.as_of_date", logic: DIRECT, bronze: "positions_raw.as_of_date" }
+  - { target: InstrumentDimID, from: "position.instrument_id", logic: KEY_RESOLUTION,
+      refmap: instrument_key, lookupDim: instrument, join: "sInstrumentKey", bronze: "positions_raw.instrument_ref" }
+  - { target: CurrencyDimID, from: "position.currency_code", logic: REFMAP_LOOKUP,
+      refmap: currency_iso, lookupDim: currency, join: "sCurrencyCodeISO", bronze: "positions_raw.ccy" }
+  - { target: Quantity, from: "position.quantity", logic: DIRECT, bronze: "positions_raw.qty" }
+  - { target: MarketValue, from: "position.market_value", logic: "quantity * latest_fx.rate", complexity: complex, bronze: "positions_raw.mv" }
+  - { target: DataSourceName, logic: LITERAL, description: "Set to 'Position Keeping System'" }

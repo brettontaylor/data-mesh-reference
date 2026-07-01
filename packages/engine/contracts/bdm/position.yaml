@@ -19,7 +19,8 @@ fields:
     type: string
     classification: internal
     facet: true
-    description: Trading book / portfolio identifier.
+    bk: true
+    description: Trading book / portfolio identifier (natural-key component).
   - name: instrument_id
     type: string
     classification: internal
@@ -28,7 +29,8 @@ fields:
   - name: as_of_date
     type: date
     classification: internal
-    description: Position snapshot date.
+    bk: true
+    description: Position snapshot date (natural-key component).
   - name: quantity
     type: decimal(18,4)
     classification: confidential
