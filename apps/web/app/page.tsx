@@ -53,30 +53,39 @@ export default async function Catalog() {
           <h2 className="font-mono text-sm uppercase tracking-wider text-accent">{domain}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((m) => (
-              <Link
+              <div
                 key={`${m.kind}:${m.id}`}
-                href={`/models/${m.kind}/${m.id}`}
-                className="group rounded-xl border border-line bg-paper p-5 transition-colors hover:border-accent/40"
+                className="group flex flex-col rounded-xl border border-line bg-paper p-5 transition-colors hover:border-accent/40"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted">{m.kind}</span>
-                  <VersionBadge version={m.version} />
-                </div>
-                <h3 className="mt-2 font-semibold text-ink">{m.id}</h3>
-                <p className="mt-1 text-sm text-muted">{m.description ?? "—"}</p>
-                {m.upstream && (
-                  <p className="mt-2 font-mono text-[0.65rem] text-muted">↑ {m.upstream}</p>
-                )}
-                {m.fields.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {[...new Set(m.fields.map((f) => f.classification))].sort().map((c) => (
-                      <ClassificationBadge key={c} level={c} />
-                    ))}
-                    {m.fields.some((f) => f.pii) && <TagBadge tag="pii" />}
-                    {m.fields.some((f) => f.mnpi) && <TagBadge tag="mnpi" />}
+                <Link href={`/models/${m.kind}/${m.id}`} className="block">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted">{m.kind}</span>
+                    <VersionBadge version={m.version} />
                   </div>
+                  <h3 className="mt-2 font-semibold text-ink">{m.id}</h3>
+                  <p className="mt-1 text-sm text-muted">{m.description ?? "—"}</p>
+                  {m.upstream && (
+                    <p className="mt-2 font-mono text-[0.65rem] text-muted">↑ {m.upstream}</p>
+                  )}
+                  {m.fields.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {[...new Set(m.fields.map((f) => f.classification))].sort().map((c) => (
+                        <ClassificationBadge key={c} level={c} />
+                      ))}
+                      {m.fields.some((f) => f.pii) && <TagBadge tag="pii" />}
+                      {m.fields.some((f) => f.mnpi) && <TagBadge tag="mnpi" />}
+                    </div>
+                  )}
+                </Link>
+                {m.kind === "bdm" && (
+                  <Link
+                    href={`/model?focus=${m.id}`}
+                    className="mt-3 inline-block font-mono text-xs text-accent hover:underline"
+                  >
+                    Open in ERD →
+                  </Link>
                 )}
-              </Link>
+              </div>
             ))}
           </div>
         </section>

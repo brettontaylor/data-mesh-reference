@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #0d1b2a;
-  --color-ink-soft: #16283a;
-  --color-paper: #f6f4ef;
-  --color-paper-soft: #efece3;
-  --color-accent: #15756b;
+  /* Confluence-style corporate palette: white surfaces, navy text, corporate blue accent */
+  --color-ink: #172b4d;
+  --color-ink-soft: #253858;
+  --color-paper: #ffffff;
+  --color-paper-soft: #f4f5f7;
+  --color-accent: #0052cc;
   --color-brass: #b5893f;
-  --color-muted: #59636f;
-  --color-line: rgba(13, 27, 42, 0.12);
+  --color-muted: #626f86;
+  --color-line: rgba(23, 43, 77, 0.14);
   --font-mono: ui-monospace, "JetBrains Mono", monospace;
 }
 

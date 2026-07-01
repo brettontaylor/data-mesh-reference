@@ -7,7 +7,7 @@ const cls: Record<string, string> = {
 
 export function ClassificationBadge({ level }: { level: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider ${cls[level] ?? cls.internal}`}>
+    <span className={`inline-flex items-center rounded-sm border px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider ${cls[level] ?? cls.internal}`}>
       {level}
     </span>
   );

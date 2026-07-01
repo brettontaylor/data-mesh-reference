@@ -26,6 +26,25 @@ export const TIER_COLOR: Record<Tier, string> = {
   restricted: T.restricted,
 };
 
+// Generic corporate ER scheme (matches the bank canonical-model drawio look):
+// light-blue entity headers, white bodies, light-blue PK rows, light-green business-key
+// rows, neutral blue-grey connectors.
+export const CORP = {
+  header: "#dae8fc",
+  headerText: "#12315e",
+  border: "#9fb3d1",
+  focus: "#3b6fb5",
+  body: "#ffffff",
+  pkRow: "#e8f0fe", // light blue
+  bkRow: "#e6f4ea", // light green
+  pkText: "#12315e",
+  bkText: "#1e6b3a",
+  text: "#1f2937",
+  muted: "#5b6675",
+  edge: "#6c8ebf",
+  outline: "#6c8ebf", // entity card border (white body + blue outline)
+};
+
 export const TIER_LABEL: Record<Tier, string> = {
   public: "Public",
   internal: "Internal",

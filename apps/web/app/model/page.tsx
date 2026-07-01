@@ -3,10 +3,15 @@ import { ErdExplorer } from "../../erd";
 
 export const dynamic = "force-dynamic";
 
-export default async function ModelPage() {
+export default async function ModelPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ focus?: string }>;
+}) {
   // The ERD is data-driven: it renders whatever BDMs the control-plane API returns,
   // so it tracks the live model set with no spec to maintain. Switch to dct.registry()
   // to include PDM / semantic / source models (the "All" toggle covers this client-side).
+  const { focus } = await searchParams;
   const { models } = await dct.models({ kind: "bdm" });
 
   return (
@@ -18,7 +23,7 @@ export default async function ModelPage() {
         <span className="text-accent">FK→</span> to traverse · &ldquo;View as&rdquo; masks attributes by clearance.
       </p>
       <div className="mt-6">
-        <ErdExplorer models={models} />
+        <ErdExplorer models={models} initialFocus={focus} />
       </div>
     </>
   );

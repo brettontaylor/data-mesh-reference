@@ -14,6 +14,7 @@ export interface SourceField {
   pii: boolean;
   mnpi: boolean;
   isPk: boolean;
+  bk?: boolean; // natural / business key
   fkRef: string | null; // "entity.field" | null
 }
 export interface SourceModel {

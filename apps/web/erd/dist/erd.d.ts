@@ -10,6 +10,7 @@ interface SourceField {
     pii: boolean;
     mnpi: boolean;
     isPk: boolean;
+    bk?: boolean;
     fkRef: string | null;
 }
 interface SourceModel {
@@ -60,6 +61,13 @@ interface ErdExplorerProps {
     kinds?: string[];
     /** CSS height of the canvas. Default 70vh. */
     height?: string;
+    /** Entity id to open expanded + centered on load (deep-link from a model page). */
+    initialFocus?: string;
+    /** Stripped-back thumbnail: no toolbar/legend/zoom-controls, just the diagram + a
+     *  floating Open-full-ERD / Fullscreen control. */
+    compact?: boolean;
+    /** URL for the "Open full ERD" control (used in compact mode). */
+    openHref?: string;
 }
 declare function ErdExplorer(props: ErdExplorerProps): react.JSX.Element;
 
