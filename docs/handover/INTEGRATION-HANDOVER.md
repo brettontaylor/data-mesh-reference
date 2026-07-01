@@ -185,7 +185,12 @@ Steps:
    components/Badges.tsx into our theme. Add ERD deep-links + a compact entity-focused embed
    on the model-detail page, and transformation/refmap detail renderers, adapting our pages.
 
-4. Verify: typecheck all packages; run generate + check (contracts↔generated agree, gates
+4. COPY these docs into our repo (rename to our tool where they say "DEAL Control Tower"):
+   ref/main:docs/handover/INTEGRATION-HANDOVER.md, docs/platform/12-governed-asset-types.md,
+   docs/platform/13-silver-to-gold-transformations.md, and
+   docs/DEAL-Control-Tower-Master-Requirements.md — we need these committed here.
+
+5. Verify: typecheck all packages; run generate + check (contracts↔generated agree, gates
    pass); propose a ChangeSet on a new asset kind and confirm the semver diff + gates; run
    the app and confirm the new kinds appear in the catalog and the ERD shows orthogonal
    routing with PK/BK shading.
