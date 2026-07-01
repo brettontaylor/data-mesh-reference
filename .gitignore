@@ -4,6 +4,12 @@ node_modules/
 .env
 .env.local
 dist/
+# Exception: the ERD module ships a PRE-BUNDLED artifact that MUST be deployed
+# (host/Railway builds do not rebuild it). Un-ignore the dir then its files so
+# `railway up` (which applies .gitignore patterns to the upload) includes them.
+!apps/web/erd/dist/
+!apps/web/erd/dist/erd.js
+!apps/web/erd/dist/erd.d.ts
 .turbo/
 .next/
 *.tsbuildinfo
