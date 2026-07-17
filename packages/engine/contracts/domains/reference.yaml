@@ -1,0 +1,10 @@
+# Domain — the top-level governed grouping. Owns products, which own the
+# BDMs/PDMs/mappings/models that realize them. Also the access boundary.
+domain: reference
+label: Reference Data
+description: >-
+  Golden reference data — counterparties, instruments, currencies and their
+  physical bindings and key-resolution maps. The shared spine other domains join to.
+owner: reference-data
+version: "1.0.0"
+status: active

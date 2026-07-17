@@ -1,0 +1,27 @@
+# Data product — reference-data-360.
+# A product bundles governed assets under ONE independently versioned unit
+# owned by a domain. Product versions do NOT track member versions: any merged
+# change to a member increments the product (minor for tier-1 changes, major
+# for tier-2/breaking) and triggers a full product re-run.
+product: reference-data-360
+label: Reference Data 360
+domain: reference
+owner: reference-data
+version: "1.1.0" # minor: added counterparty_src_to_bdm mapping member
+status: active
+description: >-
+  The golden reference-data product: counterparties, instruments, and
+  currencies with their physical bindings, semantic master view, and the
+  reusable key-resolution maps.
+includes:
+  - { kind: bdm, id: counterparty }
+  - { kind: bdm, id: currency }
+  - { kind: bdm, id: instrument }
+  - { kind: pdm, id: counterparty_physical }
+  - { kind: pdm, id: currency_physical }
+  - { kind: pdm, id: instrument_physical }
+  - { kind: mapping, id: counterparty_src_to_bdm }
+  - { kind: semantic, id: reference_master }
+  - { kind: transformation, id: dim_instrument }
+  - { kind: refmap, id: currency_iso }
+  - { kind: refmap, id: instrument_key }

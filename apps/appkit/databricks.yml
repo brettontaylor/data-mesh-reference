@@ -1,0 +1,32 @@
+# Databricks Asset Bundle — deploys the Mapping and Metadata Platform (MMP)
+# AppKit app as a Databricks App.
+# Usage:
+#   databricks bundle validate
+#   databricks bundle deploy -t dev
+#   databricks apps deploy mapping-metadata-platform   # or: databricks bundle run
+# Prereqs: a Lakebase Postgres project/branch/database (see README "Deploy").
+bundle:
+  name: mapping-metadata-platform
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      # host: https://<your-workspace>.cloud.databricks.com  # or use DATABRICKS_CONFIG_PROFILE
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}
+
+resources:
+  apps:
+    mapping_metadata_platform:
+      name: 'mapping-metadata-platform'
+      description: 'Mapping and Metadata Platform — governed asset entry + pipeline controls (AppKit prototype)'
+      source_code_path: .
+      resources:
+        - name: 'postgres'
+          description: 'Lakebase Postgres for app OLTP state (changesets, runs) + migrated gold tables'
+          database:
+            # Fill from: databricks postgres list-projects / list-branches / list-databases
+            database_name: 'databricks_postgres'
+            instance_name: 'mmp-lakebase'
+            permission: 'CAN_CONNECT_AND_CREATE'

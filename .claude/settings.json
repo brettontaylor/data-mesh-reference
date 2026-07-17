@@ -1,0 +1,51 @@
+{
+  "$comment": [
+    "Team-shared Claude Code settings for Mapping and Metadata Platform (committed, applies to every developer).",
+    "Personal overrides go in .claude/settings.local.json (git-ignored).",
+    "permissions.allow pre-approves safe read-only + pnpm-gate commands so the team isn't prompted for them.",
+    "The always-on PreToolUse hook screens destructive shell commands and asks for approval (see /careful).",
+    "Guardrail source of truth: .claude/knowledge/corporate-guardrails.md"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm generate:*)",
+      "Bash(pnpm demo:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm --filter:*)",
+      "Bash(pnpm models:*)",
+      "Bash(pnpm register:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git symbolic-ref:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git stash list:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/skills/careful/bin/check-careful.sh",
+            "statusMessage": "Screening for destructive commands..."
+          }
+        ]
+      }
+    ]
+  }
+}

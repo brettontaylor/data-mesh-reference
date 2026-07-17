@@ -60,14 +60,49 @@ export interface Mapping {
 }
 
 export type DqRuleType =
-  | "not_null" | "unique" | "referential" | "range" | "regex" | "accepted_values" | "freshness";
+  | "not_null" | "unique" | "referential" | "range" | "regex" | "accepted_values"
+  | "freshness" | "row_count_min";
+
+/** Parameter declaration on a library rule (see DqRuleDef). */
+export interface DqParamDecl {
+  name: string;
+  type: "number" | "string" | "list";
+  required?: boolean;
+  default?: unknown;
+  description?: string;
+}
+
+/** A GENERIC data-quality rule in the governed rules library (kind "dqrule").
+ *  Defined once — parameterized, column- or table-scoped — then APPLIED by
+ *  rule sets via `use:` bindings. The `check` primitive is what the runner
+ *  executes; `expression` is the illustrative SQL template that warehouse
+ *  generators may render. */
+export interface DqRuleDef {
+  rule: string; // id
+  label?: string;
+  scope: "column" | "table";
+  check: DqRuleType; // evaluator primitive
+  severity: "error" | "warn"; // default; applications may override
+  version: string;
+  status?: ModelStatus;
+  owner?: string;
+  description?: string;
+  params?: DqParamDecl[];
+  expression?: string; // e.g. "{{column}} BETWEEN {{min}} AND {{max}}"
+}
+
+/** One rule inside a rule set — EITHER an application of a library rule
+ *  (`use:` + bindings) or a legacy inline rule (`type:` + severity). */
 export interface DqRule {
-  field?: string;
+  /** library application: id of a DqRuleDef */
+  use?: string;
+  field?: string; // column binding (required for column-scoped rules)
   entity?: string;
-  type: DqRuleType;
+  /** inline rule (legacy): the primitive, when `use` is absent */
+  type?: DqRuleType;
   ref?: string; // for referential (e.g. "currency.currency_code")
-  params?: Record<string, unknown>;
-  severity: "error" | "warn";
+  params?: Record<string, unknown>; // merged over the library declarations
+  severity?: "error" | "warn"; // defaults to the library rule's severity
   description?: string;
 }
 export interface DqRuleSet {
@@ -77,6 +112,19 @@ export interface DqRuleSet {
   status?: ModelStatus;
   owner?: string;
   rules: DqRule[];
+}
+
+/** A fully resolved rule application (library defaults + overrides merged). */
+export interface ResolvedDqRule {
+  id: string; // library rule id, or "inline:<type>"
+  label: string;
+  scope: "column" | "table";
+  check: DqRuleType;
+  field?: string;
+  ref?: string;
+  params: Record<string, unknown>;
+  severity: "error" | "warn";
+  source: "library" | "inline";
 }
 
 /** A published downstream extract/view contract for a consumer. */
@@ -265,6 +313,34 @@ export interface AccessModel {
 }
 
 /** The fully-loaded contract set every generator and check consumes. */
+/** A domain — the top-level governed grouping. Domains own products, which in
+ *  turn own the BDMs/PDMs/mappings/models that realize them. Domains also carry
+ *  the access boundary (approval routing is per-domain). Independently
+ *  versioned and maker/checker'd like every governed asset. */
+export interface Domain {
+  domain: string; // id (matches the derived domain string on assets)
+  label?: string;
+  description?: string;
+  owner?: string;
+  version: string;
+  status?: ModelStatus;
+}
+
+/** A data product — a governed, independently versioned bundle of assets
+ *  owned by a domain. Product versions move on their OWN semver line: any
+ *  merged change to a member asset increments the product (minor for tier-1
+ *  changes, major for tier-2/breaking) and triggers a full product re-run. */
+export interface Product {
+  product: string; // id
+  label?: string;
+  domain: string; // owning domain (routing)
+  owner?: string;
+  version: string; // semver, independent of member BDM/PDM versions
+  status?: ModelStatus;
+  description?: string;
+  includes: AssetRef[]; // member assets ({kind, id})
+}
+
 export interface Contract {
   spec: Spec;
   entities: Entity[]; // BDMs
@@ -273,9 +349,12 @@ export interface Contract {
   sources: Source[];
   mappings: Mapping[];
   dqRuleSets: DqRuleSet[];
+  dqRules: DqRuleDef[]; // the generic DQ rules library
   extracts: Extract[];
   transformations: Transformation[];
   refMaps: RefMap[];
+  domains: Domain[];
+  products: Product[];
   access: AccessModel;
 }
 

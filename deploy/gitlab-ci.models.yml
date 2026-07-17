@@ -1,4 +1,4 @@
-# Reusable GitLab CI for a DEAL Control Tower **models repo** (the GitOps SoR).
+# Reusable GitLab CI for a Mapping and Metadata Platform **models repo** (the GitOps SoR).
 # Drop this in as .gitlab-ci.yml in the models repo. It runs the same governance
 # gates the platform enforces — so changes made directly in Git are gated too.
 # Pair with branch protection: required approvals, no self-approve, required checks.
@@ -7,7 +7,7 @@ stages: [validate]
 
 governance:
   stage: validate
-  image: ghcr.io/your-org/deal-control-tower:0.1.0
+  image: ghcr.io/your-org/mapping-metadata-platform:0.1.0
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:

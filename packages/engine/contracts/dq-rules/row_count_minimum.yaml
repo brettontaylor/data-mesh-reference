@@ -1,0 +1,12 @@
+rule: row_count_minimum
+label: Minimum row count
+scope: table
+check: row_count_min
+severity: error
+version: "1.0.0"
+status: active
+owner: data-governance
+description: The target table must contain at least minRows rows after load.
+params:
+  - { name: minRows, type: number, required: true, description: minimum row count }
+expression: "COUNT(*) >= {{minRows}}"

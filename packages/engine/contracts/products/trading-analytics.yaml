@@ -1,0 +1,22 @@
+# Data product — trading-analytics.
+# See reference-data-360.yaml for the product concept and versioning rules.
+product: trading-analytics
+label: Trading Analytics
+domain: trading
+owner: trading-data
+version: "1.0.0"
+status: active
+description: >-
+  The trading analytics product: trade and position facts, their physical
+  bindings, ingest mapping and quality rules, the position transformation,
+  the regulatory extract, and the trading-activity semantic model.
+includes:
+  - { kind: bdm, id: trade }
+  - { kind: bdm, id: position }
+  - { kind: pdm, id: trade_physical }
+  - { kind: pdm, id: position_physical }
+  - { kind: mapping, id: trade_src_to_bdm }
+  - { kind: dq, id: trade_dq }
+  - { kind: transformation, id: dim_position }
+  - { kind: extract, id: reg_trade_extract }
+  - { kind: semantic, id: trading_activity }

@@ -1,0 +1,12 @@
+rule: allowed_values
+label: Allowed values
+scope: column
+check: accepted_values
+severity: error
+version: "1.0.0"
+status: active
+owner: data-governance
+description: Values in the bound column must come from the enumerated list.
+params:
+  - { name: values, type: list, required: true, description: permitted values }
+expression: "{{column}} IN ({{values}})"

@@ -21,7 +21,7 @@ export default async function Catalog() {
         <p className="eyebrow">Catalog</p>
         <h1 className="mt-3 text-2xl font-semibold">Control plane unreachable</h1>
         <p className="mt-2 text-sm text-muted">
-          Could not reach the DEAL Control Tower API at{" "}
+          Could not reach the Mapping and Metadata Platform API at{" "}
           <code className="font-mono">{process.env.DCT_API_URL ?? "http://localhost:4400"}</code>.
           Start it with <code className="font-mono">pnpm --filter @dct/api start</code>.
         </p>

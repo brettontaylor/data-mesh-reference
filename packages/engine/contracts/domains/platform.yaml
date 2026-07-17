@@ -1,0 +1,6 @@
+domain: platform
+label: Platform
+description: Ingestion sources and cross-cutting platform assets feeding the medallion pipelines.
+owner: platform-eng
+version: "1.0.0"
+status: active

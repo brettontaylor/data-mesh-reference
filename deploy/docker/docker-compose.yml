@@ -1,4 +1,4 @@
-# DEAL Control Tower — minimal local/standalone stack.
+# Mapping and Metadata Platform — minimal local/standalone stack.
 #   docker compose -f deploy/docker/docker-compose.yml up
 # Brings up the control-plane API + web UI + Postgres + Redis. The API seeds the
 # projection from the bundled models on first boot (minimal intervention).

@@ -9,8 +9,11 @@ import type {
   Entity,
   Extract,
   DqRuleSet,
+  Domain,
+  DqRuleDef,
   Mapping,
   Pdm,
+  Product,
   RefMap,
   SemanticModel,
   Source,
@@ -57,8 +60,11 @@ export function loadContract(): Contract {
   const extracts = listYamlSafe(join(CONTRACTS, "extracts")).map((p) => readYaml<Extract>(p));
   const transformations = listYamlSafe(join(CONTRACTS, "transformations")).map((p) => readYaml<Transformation>(p));
   const refMaps = listYamlSafe(join(CONTRACTS, "refmaps")).map((p) => readYaml<RefMap>(p));
+  const dqRules = listYamlSafe(join(CONTRACTS, "dq-rules")).map((p) => readYaml<DqRuleDef>(p));
+  const domains = listYamlSafe(join(CONTRACTS, "domains")).map((p) => readYaml<Domain>(p));
+  const products = listYamlSafe(join(CONTRACTS, "products")).map((p) => readYaml<Product>(p));
   const access = readYaml<AccessModel>(join(CONTRACTS, "access.yaml"));
-  return { spec, entities, pdms, semanticModels, sources, mappings, dqRuleSets, extracts, transformations, refMaps, access };
+  return { spec, entities, pdms, semanticModels, sources, mappings, dqRuleSets, dqRules, extracts, transformations, refMaps, domains, products, access };
 }
 
 /**
@@ -94,6 +100,9 @@ export function parseContract(
     extracts: byPrefix("extracts/").map((f) => parse(f.content) as Extract),
     transformations: byPrefix("transformations/").map((f) => parse(f.content) as Transformation),
     refMaps: byPrefix("refmaps/").map((f) => parse(f.content) as RefMap),
+    dqRules: byPrefix("dq-rules/").map((f) => parse(f.content) as DqRuleDef),
+    domains: byPrefix("domains/").map((f) => parse(f.content) as Domain),
+    products: byPrefix("products/").map((f) => parse(f.content) as Product),
     access: accessFile
       ? (parse(accessFile.content) as AccessModel)
       : { roles: [], defaultRole: "" },

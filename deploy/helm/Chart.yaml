@@ -1,6 +1,6 @@
 apiVersion: v2
-name: deal-control-tower
-description: DEAL Control Tower — enterprise metadata management & governance control plane
+name: mapping-metadata-platform
+description: Mapping and Metadata Platform — enterprise metadata management & governance control plane
 type: application
 version: 0.1.0
 appVersion: "0.1.0"

@@ -1,0 +1,85 @@
+/* Pipelines page — compact medallion flow strip + migration tab.
+   Prefix: .pl-  (page-scoped; imported by PipelinesPage.tsx only). */
+
+.pl-tab-intro { margin-top: 0; }
+
+/* --- Left→right medallion flow band -------------------------------------- */
+.pl-flow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: stretch;
+  gap: 0;
+  margin: 4px 0 22px;
+}
+.pl-flow-cell { display: contents; }
+
+.pl-stage {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+.pl-stage-head { display: flex; align-items: baseline; gap: 8px; }
+.pl-stage-name {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pl-stage-bronze { color: #b07d4a; }
+.pl-stage-silver { color: #7d8aa0; }
+.pl-stage-gold { color: var(--warn); }
+.pl-stage-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--subtle-bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 8px;
+  line-height: 18px;
+}
+.pl-stage-sub {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 2px 0 10px;
+}
+
+.pl-arrow {
+  align-self: center;
+  color: var(--line-strong);
+  font-size: 20px;
+  padding: 0 10px;
+}
+
+.pl-groups { display: flex; flex-direction: column; gap: 8px; }
+.pl-group { display: flex; flex-direction: column; gap: 4px; }
+.pl-group-domain {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.pl-nodes { display: flex; flex-wrap: wrap; gap: 4px; }
+.pl-node {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  background: var(--subtle-bg);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+@media (max-width: 820px) {
+  .pl-flow { grid-template-columns: 1fr; }
+  .pl-arrow { transform: rotate(90deg); padding: 4px 0; justify-self: center; }
+}

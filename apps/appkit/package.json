@@ -1,0 +1,39 @@
+{
+  "name": "@dct/appkit-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Mapping and Metadata Platform — Databricks AppKit app (governed asset entry + pipeline controls) on the DCT engine. Deploy target: Databricks Apps + Lakebase.",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development tsx watch server/server.ts",
+    "start": "cross-env NODE_ENV=production tsx server/server.ts",
+    "build": "vite build --config client/vite.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@databricks/appkit": "0.45.0",
+    "@databricks/sdk-experimental": "0.17.0",
+    "@dct/engine": "workspace:*",
+    "@dct/shared": "workspace:*",
+    "@dct/auth": "workspace:*",
+    "cross-env": "^7.0.3",
+    "express": "^5.1.0",
+    "pg": "^8.13.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.1.1",
+    "tsx": "^4.19.2",
+    "yaml": "^2.6.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

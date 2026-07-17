@@ -1,12 +1,23 @@
+# DQ rule set for the trade BDM.
+# Rules are APPLICATIONS of the generic library (contracts/dq-rules/) via
+# `use:` — bound to a column (field) or to the table — plus one legacy inline
+# rule kept to show both forms coexist. Severity may override the library
+# default per application.
 dqRuleSet: trade_dq
 target: { kind: bdm, id: trade }
-version: 1.0.0
+version: 2.0.0
 owner: data-governance
 rules:
-  - { field: trade_id, type: not_null, severity: error }
-  - { field: trade_id, type: unique, severity: error }
-  - { field: currency_code, type: referential, ref: currency.currency_code, severity: error }
-  - { field: instrument_id, type: referential, ref: instrument.instrument_id, severity: error }
-  - { field: side, type: accepted_values, params: { values: [BUY, SELL] }, severity: error }
-  - { field: notional, type: range, params: { min: 0 }, severity: warn }
-  - { entity: trade, type: freshness, params: { maxAgeHours: 24 }, severity: warn }
+  # -- column-level applications of generic library rules --
+  - { use: not_null_standard, field: trade_id }
+  - { use: unique_standard, field: trade_id }
+  - { use: referential_integrity, field: currency_code, ref: currency.currency_code }
+  - { use: referential_integrity, field: instrument_id, ref: instrument.instrument_id }
+  - { use: allowed_values, field: side, params: { values: [BUY, SELL] } }
+  - { use: range_check, field: notional, params: { min: 0 }, severity: warn }
+  - { use: pattern_match, field: trade_id, params: { pattern: "^TRD-[0-9]+$" }, severity: warn }
+  # -- table-level applications --
+  - { use: row_count_minimum, params: { minRows: 5 } }
+  - { use: freshness_sla, params: { timestampField: trade_date, maxAgeHours: 24 } }
+  # -- legacy inline form (still supported) --
+  - { field: quantity, type: range, params: { min: 0 }, severity: warn }

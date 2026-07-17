@@ -1,0 +1,228 @@
+{
+  "generated_from": "contracts/",
+  "target": "lakebase-postgres",
+  "schema": "gold",
+  "tables": [
+    {
+      "entity": "counterparty",
+      "table": "gold.counterparty",
+      "layer": "gold",
+      "columns": [
+        {
+          "name": "counterparty_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "lei",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": false
+        },
+        {
+          "name": "legal_name",
+          "pgType": "text",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "country_code",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "credit_rating",
+          "pgType": "text",
+          "classification": "confidential",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "entity": "currency",
+      "table": "gold.currency",
+      "layer": "gold",
+      "columns": [
+        {
+          "name": "currency_code",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        },
+        {
+          "name": "minor_units",
+          "pgType": "integer",
+          "classification": "public",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "entity": "instrument",
+      "table": "gold.instrument",
+      "layer": "gold",
+      "columns": [
+        {
+          "name": "instrument_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "isin",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": false
+        },
+        {
+          "name": "cusip",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        },
+        {
+          "name": "asset_class",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        },
+        {
+          "name": "currency_code",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "entity": "position",
+      "table": "gold.position",
+      "layer": "gold",
+      "columns": [
+        {
+          "name": "position_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "book_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "instrument_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "as_of_date",
+          "pgType": "date",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "pgType": "numeric(18,4)",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "market_value",
+          "pgType": "numeric(18,2)",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "currency_code",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "entity": "trade",
+      "table": "gold.trade",
+      "layer": "gold",
+      "columns": [
+        {
+          "name": "trade_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "source_trade_ref",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": false
+        },
+        {
+          "name": "trade_date",
+          "pgType": "date",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "instrument_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "counterparty_id",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "side",
+          "pgType": "text",
+          "classification": "internal",
+          "nullable": true
+        },
+        {
+          "name": "quantity",
+          "pgType": "numeric(18,4)",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "price",
+          "pgType": "numeric(18,6)",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "notional",
+          "pgType": "numeric(18,2)",
+          "classification": "confidential",
+          "nullable": true
+        },
+        {
+          "name": "currency_code",
+          "pgType": "text",
+          "classification": "public",
+          "nullable": true
+        }
+      ]
+    }
+  ]
+}

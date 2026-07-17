@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "main": "src/server.ts",
-  "description": "DEAL Control Tower control-plane API (Phase 1: read surfaces over the projection).",
+  "description": "Mapping and Metadata Platform control-plane API (Phase 1: read surfaces over the projection).",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",

@@ -84,11 +84,11 @@
       "dependsOn": [
         "source:trades_feed"
       ],
-      "signature": "dcd88191966672c1",
+      "signature": "d7c7dd227dac9b43",
       "detail": {
         "group": "transaction",
         "grain": "one row per executed trade",
-        "fields": 10
+        "fields": 11
       }
     },
     {

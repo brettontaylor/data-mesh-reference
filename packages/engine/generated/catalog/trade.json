@@ -11,7 +11,7 @@
     "cadenceDays": 1
   },
   "classificationSummary": {
-    "internal": 5,
+    "internal": 6,
     "confidential": 3,
     "public": 1,
     "restricted": 1
@@ -22,6 +22,11 @@
       "type": "string",
       "classification": "internal",
       "primaryKey": true
+    },
+    {
+      "name": "source_trade_ref",
+      "type": "string",
+      "classification": "internal"
     },
     {
       "name": "trade_date",

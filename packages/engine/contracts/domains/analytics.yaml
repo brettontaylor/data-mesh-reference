@@ -1,0 +1,6 @@
+domain: analytics
+label: Analytics
+description: Conformed semantic models spanning the mesh for BI and analytical consumers.
+owner: analytics-eng
+version: "1.0.0"
+status: active

@@ -1,0 +1,6 @@
+domain: governance
+label: Governance
+description: Data-quality rule library and cross-domain governance assets owned by data governance.
+owner: data-governance
+version: "1.0.0"
+status: active

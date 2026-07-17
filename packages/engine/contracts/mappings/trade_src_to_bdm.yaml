@@ -1,12 +1,17 @@
 mapping: trade_src_to_bdm
 from: { kind: source, id: trades_feed }
 to: { kind: bdm, id: trade }
-version: 1.0.0
+version: 1.1.0 # minor: completed field coverage (11/11)
 owner: trading-data-eng
 rules:
   - { target: trade_id, sources: [src_trade_id], logic: IDENTITY }
   - { target: source_trade_ref, sources: [src_ref], logic: IDENTITY }
+  - { target: trade_date, sources: [trd_dt], logic: DERIVE, description: Parse yyyyMMdd to date }
   - { target: instrument_id, sources: [isin], logic: LOOKUP, description: Resolve ISIN to instrument surrogate key }
   - { target: counterparty_id, sources: [lei], logic: LOOKUP, description: Resolve LEI to counterparty surrogate key }
+  - { target: side, sources: [buy_sell_flag], logic: DERIVE, description: "B/S flag to BUY/SELL" }
+  - { target: quantity, sources: [quantity], logic: IDENTITY }
+  - { target: price, sources: [price], logic: IDENTITY }
   - { target: notional, sources: [quantity, price], logic: "quantity * price" }
   - { target: currency_code, sources: [ccy], logic: IDENTITY }
+  - { target: trader_id, sources: [trader_ref], logic: IDENTITY, description: Restricted attribute — masked beyond silver }

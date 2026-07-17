@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/your-org/deal-control-tower
+  repository: ghcr.io/your-org/mapping-metadata-platform
   tag: "0.1.0"
   pullPolicy: IfNotPresent
 

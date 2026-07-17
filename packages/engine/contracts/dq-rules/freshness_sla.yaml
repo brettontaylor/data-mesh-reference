@@ -1,0 +1,16 @@
+rule: freshness_sla
+label: Freshness SLA
+scope: table
+check: freshness
+severity: warn
+version: "1.0.0"
+status: active
+owner: data-governance
+description: >-
+  The newest value of timestampField must be no older than maxAgeHours.
+  (Evaluated in warehouse pipelines; the local runner reports it as skipped —
+  synthetic fixture data has no live clock.)
+params:
+  - { name: timestampField, type: string, required: true }
+  - { name: maxAgeHours, type: number, required: true }
+expression: "MAX({{timestampField}}) >= NOW() - INTERVAL '{{maxAgeHours}}' HOUR"

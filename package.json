@@ -1,8 +1,8 @@
 {
-  "name": "deal-control-tower",
+  "name": "mapping-metadata-platform",
   "version": "0.1.0",
   "private": true,
-  "description": "DEAL Control Tower — enterprise metadata management & governance control plane (monorepo). Evolved from the data-mesh-reference engine.",
+  "description": "Mapping and Metadata Platform — enterprise metadata management & governance control plane (monorepo). Evolved from the data-mesh-reference engine.",
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=20.9.0"

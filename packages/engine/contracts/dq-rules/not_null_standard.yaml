@@ -1,0 +1,14 @@
+# DQ rules library — generic rule (kind "dqrule").
+# Defined ONCE, generically; APPLIED by rule sets via `use:` with a column or
+# table binding. `check` is the primitive the medallion runner executes;
+# `expression` is the illustrative SQL the warehouse generators may render.
+rule: not_null_standard
+label: Not null (standard)
+scope: column
+check: not_null
+severity: error
+version: "1.0.0"
+status: active
+owner: data-governance
+description: The bound column must contain no null/empty values.
+expression: "{{column}} IS NOT NULL"

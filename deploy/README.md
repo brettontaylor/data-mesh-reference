@@ -1,4 +1,4 @@
-# Deploying DEAL Control Tower
+# Deploying Mapping and Metadata Platform
 
 Three ways to stand it up, smallest → production. All share one image
 (`deploy/docker/Dockerfile`); `ROLE` selects `api | web | worker | all`.
@@ -28,7 +28,7 @@ kubectl create secret generic dct-secrets \
   --from-literal=OIDC_ISSUER=... --from-literal=DATABRICKS_HOST=... --from-literal=DATABRICKS_TOKEN=...
 
 helm install dct deploy/helm \
-  --set image.repository=<registry>/deal-control-tower --set ingress.host=dct.internal.example.com
+  --set image.repository=<registry>/mapping-metadata-platform --set ingress.host=dct.internal.example.com
 ```
 
 API/web scale independently (HPA-ready); managed Postgres/Redis; ingress with
@@ -37,7 +37,7 @@ corporate TLS + OIDC. Set `config.DEV_AUTH=false` and `OIDC_ISSUER` for SSO.
 ## 3. Databricks App (inside the workspace perimeter)
 
 ```bash
-databricks apps deploy deal-control-tower --source-code-path deploy/databricks-app
+databricks apps deploy mapping-metadata-platform --source-code-path deploy/databricks-app
 ```
 
 See [databricks-app/app.yaml](databricks-app/app.yaml). Inherits Databricks auth +

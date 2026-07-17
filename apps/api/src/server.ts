@@ -1,4 +1,4 @@
-// DEAL Control Tower — control-plane API.
+// Mapping and Metadata Platform — control-plane API.
 // Phase 1: read surfaces. Phase 2: publication. Phase 3: auth (RBAC/ABAC).
 // Phase 4: governance (ChangeSets, maker/checker + SoD, immutable audit).
 import Fastify, { type FastifyRequest } from "fastify";
@@ -93,7 +93,7 @@ async function main() {
     return { ready: meta.modelCount > 0, ...meta, store: store.kind };
   });
   app.get("/api/v1/version", async () => ({
-    name: "deal-control-tower",
+    name: "mapping-metadata-platform",
     api: "v1",
     store: store.kind,
     gitProvider: config.gitProvider,
@@ -186,7 +186,7 @@ async function main() {
       return a;
     }, {});
     return {
-      product: "deal-control-tower",
+      product: "mapping-metadata-platform",
       api: "v1",
       sourceSha: meta.sourceSha,
       counts,

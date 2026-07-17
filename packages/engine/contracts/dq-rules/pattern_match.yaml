@@ -1,0 +1,12 @@
+rule: pattern_match
+label: Pattern match
+scope: column
+check: regex
+severity: error
+version: "1.0.0"
+status: active
+owner: data-governance
+description: Values in the bound column must match the given regular expression.
+params:
+  - { name: pattern, type: string, required: true, description: regular expression }
+expression: "REGEXP_LIKE({{column}}, '{{pattern}}')"

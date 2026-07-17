@@ -1,0 +1,50 @@
+/* Registry page — flat filterable model table + maker/checker changeset queue.
+   Prefix: .reg-  (page-scoped; imported by RegistryPage.tsx only). */
+
+.reg-badge {
+  display: inline-block;
+  margin-left: 6px;
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+}
+.tab .reg-badge { background: var(--subtle-bg); color: var(--muted); border-color: var(--line-strong); }
+.tab-active .reg-badge { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+.reg-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 16px;
+}
+.reg-select { width: auto; min-width: 150px; }
+.reg-search { width: auto; flex: 1 1 220px; min-width: 200px; max-width: 340px; margin-bottom: 0; }
+.reg-count { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+/* MODEL cell — mono id above a muted label. */
+.reg-model { display: flex; flex-direction: column; gap: 2px; }
+.reg-model .reg-label { color: var(--muted); font-size: 12px; }
+
+/* Soft, hashed per-domain tint (subtle — stays in the muted family). */
+.reg-domain-chip { border-color: var(--line-strong); }
+
+/* DEPENDS ON — wrapped list of mono dependency tokens. */
+.reg-deps { display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px; }
+.reg-dep {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--subtle-bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}

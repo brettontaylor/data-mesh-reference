@@ -47,6 +47,9 @@ CREATE MASKING POLICY IF NOT EXISTS MASK_POSITION_MARKET_VALUE AS (val STRING) R
 CREATE MASKING POLICY IF NOT EXISTS MASK_TRADE_TRADE_ID AS (val STRING) RETURNS STRING ->
   CASE WHEN CURRENT_ROLE() IN ('DM_ANALYST', 'DM_TRADER', 'DM_RISK', 'DM_COMPLIANCE') THEN val ELSE '***MASKED***' END;  -- internal
 
+CREATE MASKING POLICY IF NOT EXISTS MASK_TRADE_SOURCE_TRADE_REF AS (val STRING) RETURNS STRING ->
+  CASE WHEN CURRENT_ROLE() IN ('DM_ANALYST', 'DM_TRADER', 'DM_RISK', 'DM_COMPLIANCE') THEN val ELSE '***MASKED***' END;  -- internal
+
 CREATE MASKING POLICY IF NOT EXISTS MASK_TRADE_TRADE_DATE AS (val STRING) RETURNS STRING ->
   CASE WHEN CURRENT_ROLE() IN ('DM_ANALYST', 'DM_TRADER', 'DM_RISK', 'DM_COMPLIANCE') THEN val ELSE '***MASKED***' END;  -- internal
 
@@ -97,9 +100,9 @@ CREATE OR REPLACE TABLE GOLD.INSTRUMENT (
 -- Position (one row per book / instrument / as-of date)
 CREATE OR REPLACE TABLE GOLD.POSITION (
     position_id          VARCHAR PRIMARY KEY COMMENT 'internal: Surrogate key (book_id + instrument_id + as_of_date).',
-    book_id              VARCHAR COMMENT 'internal: Trading book / portfolio identifier.',
+    book_id              VARCHAR COMMENT 'internal: Trading book / portfolio identifier (natural-key component).',
     instrument_id        VARCHAR COMMENT 'internal: Held instrument.',
-    as_of_date           DATE COMMENT 'internal: Position snapshot date.',
+    as_of_date           DATE COMMENT 'internal: Position snapshot date (natural-key component).',
     quantity             NUMBER(18,4) COMMENT 'confidential/MNPI: Net held quantity.',
     market_value         NUMBER(18,2) COMMENT 'confidential/MNPI: Mark-to-market value.',
     currency_code        VARCHAR COMMENT 'public: Valuation currency.'
@@ -107,7 +110,8 @@ CREATE OR REPLACE TABLE GOLD.POSITION (
 
 -- Trade (one row per executed trade)
 CREATE OR REPLACE TABLE GOLD.TRADE (
-    trade_id             VARCHAR PRIMARY KEY COMMENT 'internal: Unique trade identifier.',
+    trade_id             VARCHAR PRIMARY KEY COMMENT 'internal: Unique trade identifier (surrogate key).',
+    source_trade_ref     VARCHAR COMMENT 'internal: Source-system trade reference (natural/business key from the OMS).',
     trade_date           DATE COMMENT 'internal: Execution date.',
     instrument_id        VARCHAR COMMENT 'internal: Traded instrument.',
     counterparty_id      VARCHAR COMMENT 'internal: Trade counterparty.',
@@ -131,6 +135,7 @@ ALTER TABLE GOLD.POSITION MODIFY COLUMN as_of_date SET MASKING POLICY MASK_POSIT
 ALTER TABLE GOLD.POSITION MODIFY COLUMN quantity SET MASKING POLICY MASK_POSITION_QUANTITY;
 ALTER TABLE GOLD.POSITION MODIFY COLUMN market_value SET MASKING POLICY MASK_POSITION_MARKET_VALUE;
 ALTER TABLE GOLD.TRADE MODIFY COLUMN trade_id SET MASKING POLICY MASK_TRADE_TRADE_ID;
+ALTER TABLE GOLD.TRADE MODIFY COLUMN source_trade_ref SET MASKING POLICY MASK_TRADE_SOURCE_TRADE_REF;
 ALTER TABLE GOLD.TRADE MODIFY COLUMN trade_date SET MASKING POLICY MASK_TRADE_TRADE_DATE;
 ALTER TABLE GOLD.TRADE MODIFY COLUMN instrument_id SET MASKING POLICY MASK_TRADE_INSTRUMENT_ID;
 ALTER TABLE GOLD.TRADE MODIFY COLUMN counterparty_id SET MASKING POLICY MASK_TRADE_COUNTERPARTY_ID;

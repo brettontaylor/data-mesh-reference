@@ -1,4 +1,4 @@
--- DEAL Control Tower — projection schema (Phase 1).
+-- Mapping and Metadata Platform — projection schema (Phase 1).
 -- The projection is a rebuildable read-model of the Git models repo (the SoR).
 -- Workflow/audit/lineage tables are added in later phases (see docs/platform/02).
 

@@ -1,0 +1,43 @@
+/* Model explorer — domain / product overlay above the vendored ERD.
+   Prefix: .exp-  (avoid collisions with parallel-agent edits to styles.css) */
+
+.exp-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 4px 0 16px;
+}
+.exp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.exp-field-label {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.exp-select {
+  min-width: 200px;
+  cursor: pointer;
+}
+.exp-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  padding-bottom: 8px;
+  margin-left: auto;
+}
+.exp-clear {
+  margin-right: 0;
+}
+.exp-empty {
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: 4px;
+}

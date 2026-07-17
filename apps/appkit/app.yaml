@@ -1,0 +1,18 @@
+# Databricks Apps runtime config — Mapping and Metadata Platform AppKit app.
+# The platform runs this command inside the app container; PGHOST/PGDATABASE/
+# PGPORT/PGSSLMODE are auto-injected when a Lakebase database resource is
+# attached to the app (see databricks.yml + README "Deploy").
+command: ['npm', 'run', 'start']
+env:
+  - name: 'APP_MODE'
+    value: 'databricks'
+  - name: 'DEV_AUTH'
+    value: 'false'
+  # Roles granted to platform-authenticated users (x-forwarded-*) until the
+  # corporate IdP claim mapping is wired. Comma-separated @dct/auth roles.
+  - name: 'APP_DEFAULT_ROLES'
+    value: 'modeler'
+  # Lakebase endpoint resource name; injected from the attached database
+  # resource at deploy time (valueFrom pattern per AppKit lakebase plugin).
+  - name: 'LAKEBASE_ENDPOINT'
+    valueFrom: 'postgres'

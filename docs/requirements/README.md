@@ -20,6 +20,7 @@ collection your team can review, baseline, and trace the build against.
 | [05-compliance-and-security.md](05-compliance-and-security.md) | Regulatory & security control requirements (CR) |
 | [07-federated-operating-model.md](07-federated-operating-model.md) | **Federated governance** — domains own & propose; Chief Data Architect signs off (FR-FG) |
 | [06-traceability-matrix.md](06-traceability-matrix.md) | Requirement → build phase → Jira epic traceability |
+| [08-appkit-increment.md](08-appkit-increment.md) | **Increment** — new/refined requirements from the AppKit build (domains, products, auto-versioning, two-tier routing, DQ library, mapping documents, Lakebase generation, UI/IA, Streamlit parallel child), each flagged NEW or REFINES |
 
 > The **federated operating model** (domain ownership + Chief Data Architect
 > sign-off) is a first-class governance concern. The operating-model proposal lives

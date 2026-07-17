@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DEAL Control Tower",
+  title: "Mapping and Metadata Platform",
   description: "Enterprise metadata management & governance control plane.",
 };
 
@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="border-b border-line bg-paper/80 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <Link href="/" className="font-mono text-sm font-semibold text-ink">
-              DEAL Control Tower
+              Mapping and Metadata Platform
             </Link>
             <nav className="flex gap-6 text-sm text-muted">
               <Link href="/" className="hover:text-ink">Catalog</Link>

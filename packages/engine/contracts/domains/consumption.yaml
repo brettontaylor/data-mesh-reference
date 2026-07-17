@@ -1,0 +1,6 @@
+domain: consumption
+label: Consumption
+description: Published consumer extract and view contracts (e.g. regulatory reporting).
+owner: data-consumers
+version: "1.0.0"
+status: active

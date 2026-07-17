@@ -3,6 +3,13 @@ node_modules/
 .DS_Store
 .env
 .env.local
+
+# Claude Code: per-developer state (skills keep runtime state here) and personal settings.
+# The shared team config (.claude/settings.json, .claude/skills/, .claude/knowledge/) IS committed.
+.claude/.state/
+.claude/settings.local.json
+# Session continuity is local, not shared history:
+.context/
 dist/
 # Exception: the ERD module ships a PRE-BUNDLED artifact that MUST be deployed
 # (host/Railway builds do not rebuild it). Un-ignore the dir then its files so
@@ -19,3 +26,4 @@ next-env.d.ts
 # (and the site vendors it). Regenerate with `pnpm generate`.
 # Local medallion run outputs are noisy, so ignore just those:
 packages/engine/generated/medallion/
+.gitnexus

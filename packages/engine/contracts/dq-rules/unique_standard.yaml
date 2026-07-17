@@ -1,0 +1,10 @@
+rule: unique_standard
+label: Unique (standard)
+scope: column
+check: unique
+severity: error
+version: "1.0.0"
+status: active
+owner: data-governance
+description: Every value in the bound column must be distinct.
+expression: "COUNT(*) = COUNT(DISTINCT {{column}})"

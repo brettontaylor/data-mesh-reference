@@ -1,0 +1,9 @@
+/* Access page — tabbed access management.
+   Prefix: .acc-  (page-scoped; imported by AccessPage.tsx only).
+   Most element styles (policy-cards, matrix, checker) come from the shared
+   design system; this file only holds page-local spacing tweaks. */
+
+/* Give the first section inside a tab a little breathing room below the tabs. */
+.page .tabs + section {
+  margin-top: 4px;
+}

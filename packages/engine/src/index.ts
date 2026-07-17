@@ -2,6 +2,7 @@
 export * from "./framework/types";
 export * from "./framework/access";
 export * from "./framework/version";
+export * from "./framework/dq";
 export { loadContract, parseContract, entityById, sourceById, pkOf, ROOT } from "./framework/load";
 export * from "./generators";
 export * from "./governance/checks";
@@ -13,4 +14,4 @@ export {
   loadLock,
 } from "./registry/registry";
 export * from "./registry/surface";
-export { runMedallion, type LayerStats } from "./medallion/run";
+export { runMedallion, type LayerStats, type DqResult } from "./medallion/run";

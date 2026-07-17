@@ -1,5 +1,5 @@
 // dmref CLI — drive the reference data mesh.
-//   generate  contracts -> generated/ (databricks, snowflake, cube, catalog)
+//   generate  contracts -> generated/ (databricks, snowflake, postgres, cube, catalog)
 //   check     run governance gates (classification, registry, fk, propagation)
 //   run       execute the medallion locally on synthetic data
 //   demo      check -> generate -> run -> verify propagation

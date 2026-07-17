@@ -1,6 +1,6 @@
-# DEAL Control Tower — Data Mesh Reference (monorepo)
+# Mapping and Metadata Platform — Data Mesh Reference (monorepo)
 
-> **Evolving into a product.** This repo is becoming **DEAL Control Tower**, an
+> **Evolving into a product.** This repo is becoming **Mapping and Metadata Platform**, an
 > enterprise metadata management & governance control plane. The proven engine
 > below now lives in [`packages/engine`](packages/engine); the full platform design
 > (services, UI, adapters, metastore, workflows) is in
@@ -68,7 +68,7 @@ apps/
   api/ worker/ cli/ web/   control-plane skeletons (built out per the roadmap)
 docs/
   overview.md         engine architecture
-  platform/           DEAL Control Tower design, playbook, implementation guide
+  platform/           Mapping and Metadata Platform design, playbook, implementation guide
 ```
 
 ## The model

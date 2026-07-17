@@ -1,0 +1,8 @@
+domain: trading
+label: Trading
+description: >-
+  Trade and position facts, their gold transformations, consumer extracts and
+  the trading-activity semantic models served to BI and risk.
+owner: trading-data
+version: "1.0.0"
+status: active

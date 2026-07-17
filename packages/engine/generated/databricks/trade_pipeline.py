@@ -32,6 +32,7 @@ def silver_trade():
     return (
         dlt.read("bronze_trade").select(
         F.col("trade_id").cast("string").alias("trade_id"),
+        F.col("source_trade_ref").cast("string").alias("source_trade_ref"),
         F.col("trade_date").cast("date").alias("trade_date"),
         F.col("instrument_id").cast("string").alias("instrument_id"),
         F.col("counterparty_id").cast("string").alias("counterparty_id"),
@@ -52,5 +53,5 @@ def silver_trade():
 )
 def gold_trade():
     # restricted columns excluded from gold mart: trader_id
-    return dlt.read("silver_trade").select("trade_id", "trade_date", "instrument_id", "counterparty_id", "side", "quantity", "price", "notional", "currency_code")
+    return dlt.read("silver_trade").select("trade_id", "source_trade_ref", "trade_date", "instrument_id", "counterparty_id", "side", "quantity", "price", "notional", "currency_code")
 

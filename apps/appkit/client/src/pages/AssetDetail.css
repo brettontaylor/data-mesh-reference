@@ -1,0 +1,110 @@
+/* Asset detail — model/entity detail page. Airy, catalog-flavoured layout.
+   Prefix: .ad-  (avoid collisions with parallel-agent edits to styles.css) */
+
+.ad-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.ad-head-main {
+  min-width: 0;
+}
+.ad-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.ad-kind {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.ad-domain {
+  text-transform: none;
+}
+.ad-title {
+  margin: 0 0 10px;
+  word-break: break-word;
+}
+.ad-title code {
+  font-family: var(--font-mono);
+  font-size: inherit;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  background: none;
+  padding: 0;
+}
+.ad-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ad-label {
+  font-size: 16px;
+  color: var(--text);
+}
+.ad-sub-line {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--muted);
+}
+.ad-sub-val {
+  color: var(--text);
+}
+
+/* Embedded, entity-focused ERD sits inside the shared .erd-host frame. */
+.ad-erd {
+  margin-top: 0;
+}
+.ad-erd-msg {
+  margin-top: 0;
+  padding: 24px 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Schema table tweaks on top of the shared .data-table. */
+.ad-panel {
+  padding: 0;
+  overflow: hidden;
+}
+.ad-schema {
+  margin: 0;
+}
+.ad-badge {
+  margin-left: 6px;
+  font-size: 10px;
+  padding: 1px 6px;
+  vertical-align: middle;
+}
+.ad-fk {
+  text-decoration: none;
+}
+.ad-fk:hover .mono-id {
+  color: var(--accent);
+}
+
+/* Dependency chips. */
+.ad-deps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-dep-link {
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+.ad-dep-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ad-detail {
+  max-height: 460px;
+}

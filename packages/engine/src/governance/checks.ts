@@ -3,6 +3,8 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, entityById, pkOf } from "../framework/load";
+import { parseSemver } from "../framework/version";
+import { missingDqParams } from "../framework/dq";
 import type { Contract } from "../framework/types";
 
 export interface Issue {
@@ -198,6 +200,255 @@ export function checkContract(c: Contract): Issue[] {
     }
   }
 
+  // 7b. Domains — unique ids, valid independent semver.
+  const seenDomains = new Set<string>();
+  for (const d of c.domains) {
+    if (seenDomains.has(d.domain))
+      issues.push({
+        level: "error",
+        code: "DOMAIN_DUPLICATE",
+        message: `domain "${d.domain}" is defined more than once.`,
+      });
+    seenDomains.add(d.domain);
+    if (!parseSemver(d.version))
+      issues.push({
+        level: "error",
+        code: "DOMAIN_VERSION_INVALID",
+        message: `domain "${d.domain}" version "${d.version}" is not valid semver.`,
+      });
+  }
+
+  // 8. Products — unique ids, valid independent semver, every member resolves,
+  //    and (when domains are declared) the owning domain exists.
+  const memberIds: Record<string, Set<string>> = {
+    bdm: new Set(c.entities.map((e) => e.entity)),
+    pdm: new Set(c.pdms.map((p) => p.pdm)),
+    semantic: new Set(c.semanticModels.map((s) => s.semanticModel)),
+    mapping: new Set(c.mappings.map((m) => m.mapping)),
+    dq: new Set(c.dqRuleSets.map((d) => d.dqRuleSet)),
+    extract: new Set(c.extracts.map((x) => x.extract)),
+    transformation: new Set(c.transformations.map((t) => t.transformation)),
+    refmap: new Set(c.refMaps.map((r) => r.refmap)),
+  };
+  const seenProducts = new Set<string>();
+  for (const p of c.products) {
+    if (seenProducts.has(p.product)) {
+      issues.push({
+        level: "error",
+        code: "PRODUCT_DUPLICATE",
+        message: `product "${p.product}" is defined more than once.`,
+      });
+    }
+    seenProducts.add(p.product);
+    if (!parseSemver(p.version)) {
+      issues.push({
+        level: "error",
+        code: "PRODUCT_VERSION_INVALID",
+        message: `product "${p.product}" version "${p.version}" is not valid semver.`,
+      });
+    }
+    if (!p.includes || p.includes.length === 0) {
+      issues.push({
+        level: "error",
+        code: "PRODUCT_EMPTY",
+        message: `product "${p.product}" declares no member assets.`,
+      });
+    }
+    if (c.domains.length > 0 && p.domain && !seenDomains.has(p.domain))
+      issues.push({
+        level: "error",
+        code: "PRODUCT_DOMAIN_UNRESOLVED",
+        message: `product "${p.product}" is in domain "${p.domain}" which is not defined.`,
+      });
+    for (const m of p.includes ?? []) {
+      if (!memberIds[m.kind]?.has(m.id)) {
+        issues.push({
+          level: "error",
+          code: "PRODUCT_MEMBER_UNRESOLVED",
+          message: `product "${p.product}" member ${m.kind}/${m.id} does not resolve.`,
+        });
+      }
+    }
+  }
+
+  // 9. DQ rules library — well-formed generic rules; every application binds
+  //    correctly (rule resolves, scope matches the binding, required params
+  //    supplied, bound column exists on the target BDM).
+  const DQ_CHECKS = new Set([
+    "not_null", "unique", "referential", "range", "regex", "accepted_values",
+    "freshness", "row_count_min",
+  ]);
+  const seenDqRules = new Set<string>();
+  for (const d of c.dqRules) {
+    if (seenDqRules.has(d.rule)) {
+      issues.push({
+        level: "error",
+        code: "DQRULE_DUPLICATE",
+        message: `dq rule "${d.rule}" is defined more than once in the library.`,
+      });
+    }
+    seenDqRules.add(d.rule);
+    if (!parseSemver(d.version))
+      issues.push({
+        level: "error",
+        code: "DQRULE_VERSION_INVALID",
+        message: `dq rule "${d.rule}" version "${d.version}" is not valid semver.`,
+      });
+    if (d.scope !== "column" && d.scope !== "table")
+      issues.push({
+        level: "error",
+        code: "DQRULE_SCOPE_INVALID",
+        message: `dq rule "${d.rule}" scope must be column|table (got "${d.scope}").`,
+      });
+    if (!DQ_CHECKS.has(d.check))
+      issues.push({
+        level: "error",
+        code: "DQRULE_CHECK_UNKNOWN",
+        message: `dq rule "${d.rule}" check "${d.check}" is not a known primitive.`,
+      });
+  }
+  for (const rs of c.dqRuleSets) {
+    const target =
+      rs.target.kind === "bdm" ? entityById(c, rs.target.id) : undefined;
+    for (const [i, r] of rs.rules.entries()) {
+      const where = `rule set "${rs.dqRuleSet}" rule #${i + 1}`;
+      if (r.use && r.type) {
+        issues.push({
+          level: "error",
+          code: "DQ_APPLICATION_AMBIGUOUS",
+          message: `${where} sets both "use" (library) and "type" (inline) — pick one.`,
+        });
+        continue;
+      }
+      if (!r.use) {
+        if (!r.type)
+          issues.push({
+            level: "error",
+            code: "DQ_APPLICATION_EMPTY",
+            message: `${where} has neither "use" nor "type".`,
+          });
+        continue; // inline rules keep their legacy semantics
+      }
+      const def = c.dqRules.find((d) => d.rule === r.use);
+      if (!def) {
+        issues.push({
+          level: "error",
+          code: "DQ_LIBRARY_RULE_UNRESOLVED",
+          message: `${where} applies unknown library rule "${r.use}".`,
+        });
+        continue;
+      }
+      if (def.scope === "column" && !r.field)
+        issues.push({
+          level: "error",
+          code: "DQ_BINDING_SCOPE",
+          message: `${where} applies column-scoped "${def.rule}" without a field binding.`,
+        });
+      if (def.scope === "table" && r.field)
+        issues.push({
+          level: "error",
+          code: "DQ_BINDING_SCOPE",
+          message: `${where} applies table-scoped "${def.rule}" with a field binding.`,
+        });
+      if (target && r.field && !target.fields.some((f) => f.name === r.field))
+        issues.push({
+          level: "error",
+          code: "DQ_BINDING_FIELD_UNKNOWN",
+          message: `${where} binds field "${r.field}" which does not exist on ${rs.target.id}.`,
+        });
+      const missing = missingDqParams(def, r);
+      if (missing.length > 0)
+        issues.push({
+          level: "error",
+          code: "DQ_PARAMS_MISSING",
+          message: `${where} ("${def.rule}") is missing required param(s): ${missing.join(", ")}.`,
+        });
+    }
+  }
+
+  // 10. Mapping documents — reference integrity for the governed
+  //     bronze→silver (mapping) and silver→gold (transformation) docs.
+  for (const m of c.mappings) {
+    const from =
+      m.from.kind === "source"
+        ? c.sources.find((s) => s.source === m.from.id)
+        : m.from.kind === "bdm"
+          ? entityById(c, m.from.id)
+          : undefined;
+    if (!from)
+      issues.push({
+        level: "error",
+        code: "MAPPING_FROM_UNRESOLVED",
+        message: `mapping "${m.mapping}" from ${m.from.kind}/${m.from.id} does not resolve.`,
+      });
+    const toEntity = m.to.kind === "bdm" ? entityById(c, m.to.id) : undefined;
+    if (m.to.kind === "bdm" && !toEntity)
+      issues.push({
+        level: "error",
+        code: "MAPPING_TO_UNRESOLVED",
+        message: `mapping "${m.mapping}" to ${m.to.kind}/${m.to.id} does not resolve.`,
+      });
+    if (toEntity) {
+      for (const r of m.rules) {
+        if (!toEntity.fields.some((f) => f.name === r.target))
+          issues.push({
+            level: "error",
+            code: "MAPPING_TARGET_FIELD_UNKNOWN",
+            message: `mapping "${m.mapping}" rule targets "${r.target}" which does not exist on ${m.to.id}.`,
+          });
+      }
+    }
+  }
+  for (const t of c.transformations) {
+    if (t.target.kind === "pdm" && !c.pdms.some((p) => p.pdm === t.target.id))
+      issues.push({
+        level: "error",
+        code: "TRANSFORMATION_TARGET_UNRESOLVED",
+        message: `transformation "${t.transformation}" target ${t.target.kind}/${t.target.id} does not resolve.`,
+      });
+    for (const s of t.sources) {
+      if (!entityById(c, s.entity))
+        issues.push({
+          level: "error",
+          code: "TRANSFORMATION_SOURCE_UNRESOLVED",
+          message: `transformation "${t.transformation}" source "${s.entity}" is not a defined BDM.`,
+        });
+    }
+    for (const rmId of t.uses ?? []) {
+      if (!c.refMaps.some((r) => r.refmap === rmId))
+        issues.push({
+          level: "error",
+          code: "TRANSFORMATION_REFMAP_UNRESOLVED",
+          message: `transformation "${t.transformation}" uses refmap "${rmId}" which is not defined.`,
+        });
+    }
+    for (const f of t.fields) {
+      // `from` is "entity.field" — validate both halves when present.
+      if (!f.from) continue;
+      const [ent, fld] = f.from.split(".");
+      const src = ent ? entityById(c, ent) : undefined;
+      if (!src) {
+        issues.push({
+          level: "error",
+          code: "TRANSFORMATION_FROM_UNRESOLVED",
+          message: `transformation "${t.transformation}" field "${f.target}" reads from unknown entity "${ent}".`,
+        });
+      } else if (fld && !src.fields.some((x) => x.name === fld)) {
+        issues.push({
+          level: "error",
+          code: "TRANSFORMATION_FROM_FIELD_UNKNOWN",
+          message: `transformation "${t.transformation}" field "${f.target}" reads "${f.from}" but ${ent} has no field "${fld}".`,
+        });
+      }
+      if (f.refmap && !c.refMaps.some((r) => r.refmap === f.refmap))
+        issues.push({
+          level: "error",
+          code: "TRANSFORMATION_REFMAP_UNRESOLVED",
+          message: `transformation "${t.transformation}" field "${f.target}" uses unknown refmap "${f.refmap}".`,
+        });
+    }
+  }
+
   return issues;
 }
 
@@ -218,6 +469,7 @@ export function checkPropagation(c: Contract): Issue[] {
     join(gen, "databricks", `${e}_pipeline.py`),
     join(gen, "cube", `${e}.yml`),
     join(gen, "catalog", `${e}.json`),
+    join(gen, "postgres", "tables", `${e}.sql`),
   ];
   for (const e of c.entities) {
     for (const path of surfaces(e.entity)) {
@@ -231,7 +483,13 @@ export function checkPropagation(c: Contract): Issue[] {
     }
   }
   // Single-file surfaces.
-  for (const single of ["snowflake/serving.sql", "access/policy.json", "registry/registry.json"]) {
+  for (const single of [
+    "snowflake/serving.sql",
+    "postgres/schema.sql",
+    "postgres/manifest.json",
+    "access/policy.json",
+    "registry/registry.json",
+  ]) {
     if (!existsSync(join(gen, single))) {
       issues.push({
         level: "error",

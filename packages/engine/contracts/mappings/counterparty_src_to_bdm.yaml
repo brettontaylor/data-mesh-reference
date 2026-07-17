@@ -1,0 +1,15 @@
+# Governed bronze→silver mapping document — counterparty.
+# Field-level rules from the landed source columns to the governed BDM.
+# Versioned independently; edits flow through maker/checker like any asset.
+mapping: counterparty_src_to_bdm
+from: { kind: source, id: reference_feed }
+to: { kind: bdm, id: counterparty }
+version: 1.0.0
+owner: reference-data
+rules:
+  - { target: counterparty_id, sources: [cp_id], logic: IDENTITY }
+  - { target: lei, sources: [lei_code], logic: "UPPER(TRIM(lei_code))", description: Normalize LEI to uppercase }
+  - { target: legal_name, sources: [name_raw], logic: DERIVE, description: Trim + collapse whitespace }
+  - { target: country_code, sources: [country], logic: LOOKUP, description: Resolve to ISO-3166 alpha-2 }
+  - { target: credit_rating, sources: [rating_agency, rating_raw], logic: DERIVE, description: Prefer agency composite when both present }
+  - { target: internal_risk_score, sources: [risk_model_out], logic: IDENTITY }

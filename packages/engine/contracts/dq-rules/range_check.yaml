@@ -1,0 +1,13 @@
+rule: range_check
+label: Numeric range
+scope: column
+check: range
+severity: warn
+version: "1.0.0"
+status: active
+owner: data-governance
+description: Numeric values in the bound column must fall inside [min, max].
+params:
+  - { name: min, type: number, required: false, description: inclusive lower bound }
+  - { name: max, type: number, required: false, description: inclusive upper bound }
+expression: "{{column}} BETWEEN {{min}} AND {{max}}"

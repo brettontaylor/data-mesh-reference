@@ -430,8 +430,25 @@
       },
       "signature": "7ab92ff1b88e3654"
     },
-    "trade_src_to_bdm": {
+    "counterparty_src_to_bdm": {
       "version": "1.0.0",
+      "surface": {
+        "kind": "mapping",
+        "from": "source:reference_feed",
+        "to": "bdm:counterparty",
+        "rules": [
+          "counterparty_id<=cp_id:IDENTITY",
+          "country_code<=country:LOOKUP",
+          "credit_rating<=rating_agency+rating_raw:DERIVE",
+          "internal_risk_score<=risk_model_out:IDENTITY",
+          "legal_name<=name_raw:DERIVE",
+          "lei<=lei_code:UPPER(TRIM(lei_code))"
+        ]
+      },
+      "signature": "17b3d8dec8f598ed"
+    },
+    "trade_src_to_bdm": {
+      "version": "1.1.0",
       "surface": {
         "kind": "mapping",
         "from": "source:trades_feed",
@@ -441,28 +458,36 @@
           "currency_code<=ccy:IDENTITY",
           "instrument_id<=isin:LOOKUP",
           "notional<=quantity+price:quantity * price",
+          "price<=price:IDENTITY",
+          "quantity<=quantity:IDENTITY",
+          "side<=buy_sell_flag:DERIVE",
           "source_trade_ref<=src_ref:IDENTITY",
-          "trade_id<=src_trade_id:IDENTITY"
+          "trade_date<=trd_dt:DERIVE",
+          "trade_id<=src_trade_id:IDENTITY",
+          "trader_id<=trader_ref:IDENTITY"
         ]
       },
-      "signature": "4900735f8f14d551"
+      "signature": "9c1f59aa3342313e"
     },
     "trade_dq": {
-      "version": "1.0.0",
+      "version": "2.0.0",
       "surface": {
         "kind": "dq",
         "target": "bdm:trade",
         "rules": [
-          "currency_code:referential:currency.currency_code:{}:error",
-          "instrument_id:referential:instrument.instrument_id:{}:error",
-          "notional:range::{\"min\":0}:warn",
-          "side:accepted_values::{\"values\":[\"BUY\",\"SELL\"]}:error",
-          "trade:freshness::{\"maxAgeHours\":24}:warn",
-          "trade_id:not_null::{}:error",
-          "trade_id:unique::{}:error"
+          "currency_code:undefined:currency.currency_code:{}:undefined",
+          "instrument_id:undefined:instrument.instrument_id:{}:undefined",
+          "notional:undefined::{\"min\":0}:warn",
+          "quantity:range::{\"min\":0}:warn",
+          "side:undefined::{\"values\":[\"BUY\",\"SELL\"]}:undefined",
+          "trade_id:undefined::{\"pattern\":\"^TRD-[0-9]+$\"}:warn",
+          "trade_id:undefined::{}:undefined",
+          "trade_id:undefined::{}:undefined",
+          "undefined:undefined::{\"minRows\":5}:undefined",
+          "undefined:undefined::{\"timestampField\":\"trade_date\",\"maxAgeHours\":24}:undefined"
         ]
       },
-      "signature": "e440f8ec657b4cd1"
+      "signature": "57414a6f29797c12"
     },
     "reg_trade_extract": {
       "version": "2.1.0",
